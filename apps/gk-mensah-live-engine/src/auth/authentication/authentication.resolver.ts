@@ -12,4 +12,9 @@ export class AuthenticationResolver {
         return this.authService.send<String>('pingAuthentication', "");
     }
 
+    @Query(() => String, { name: 'pingDB' })
+    async pingDatabase() {
+        return this.authService.send<String>('pingAuthenticationDatabase', "");
+    }
+
 }

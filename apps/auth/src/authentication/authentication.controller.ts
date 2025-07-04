@@ -10,5 +10,9 @@ export class AuthenticationController {
   ping() {
     return "authentication service is up and running";
   }
-
+  
+  @MessagePattern('pingAuthenticationDatabase')
+  pingDatabase() {
+    return this.authenticationService.pingDatabase();
+  }
 }

@@ -19,10 +19,10 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@app/lib": [
-        "libs/lib/src"
+        "libs/drizzle/src"
       ],
       "@app/lib/*": [
-        "libs/lib/src/*"
+        "libs/drizzle/src/*"
       ]
     }
   }

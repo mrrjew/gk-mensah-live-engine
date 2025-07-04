@@ -1,0 +1,1 @@
+export * as authSchema from '../authentication/entities/user.entity';

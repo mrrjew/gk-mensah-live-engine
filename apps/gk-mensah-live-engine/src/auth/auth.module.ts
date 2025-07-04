@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthenticationResolver } from './authentication/authentication.resolver';
-import { AuthenticationModule } from 'apps/auth/authentication/authentication.module';
+import { AuthenticationModule } from 'apps/auth/src/authentication/authentication.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
