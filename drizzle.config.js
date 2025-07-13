@@ -1,5 +1,5 @@
 export default {
-    schema: ['./apps/gk-mensah-live-engine/src/database','./apps/auth/src/database'],
+    schema: ['./apps/auth/src/entities'],
     out: './drizzle/migrations',
     dialect: 'postgresql',
     dbCredentials: {

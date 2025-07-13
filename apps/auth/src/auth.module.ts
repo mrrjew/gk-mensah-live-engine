@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthenticationModule } from './authentication/authentication.module';
-import { DrizzleModule } from '@app/lib';
+import { DrizzleModule } from 'libs/core/src/drizzle';
 
 @Module({
   imports: [AuthenticationModule,DrizzleModule],

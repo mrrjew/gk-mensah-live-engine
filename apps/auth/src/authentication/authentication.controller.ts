@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AuthenticationService } from './authentication.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller()
 export class AuthenticationController {
@@ -14,5 +15,10 @@ export class AuthenticationController {
   @MessagePattern('pingAuthenticationDatabase')
   pingDatabase() {
     return this.authenticationService.pingDatabase();
+  }
+
+  @MessagePattern('createUser')
+  async createUser(userData: CreateUserDto) {
+    return this.authenticationService.createUser(userData);
   }
 }

@@ -18,11 +18,17 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/lib": [
-        "libs/drizzle/src"
+      "@app/auth": [
+        "apps/auth/src"
       ],
-      "@app/lib/*": [
-        "libs/drizzle/src/*"
+      "@app/auth/*": [
+        "apps/auth/src"
+      ],
+      "@app/lib/core": [
+        "libs/core/src"
+      ],
+      "@app/lib/core/*": [
+        "libs/core/src/*"
       ]
     }
   }
