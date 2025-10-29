@@ -13,7 +13,7 @@ export class HashService {
       password: string,
       hashedPassword: string
    ): Promise<boolean> {
-      const isMatch = await bcrypt.verify(hashedPassword, password);
+      const isMatch = await bcrypt.compare(password,hashedPassword );
       return isMatch;
    }
   }

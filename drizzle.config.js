@@ -1,5 +1,5 @@
 export default {
-    schema: ['./apps/auth/src/entities'],
+    schema: ['./apps/core/src/entities'],
     out: './drizzle/migrations',
     dialect: 'postgresql',
     dbCredentials: {

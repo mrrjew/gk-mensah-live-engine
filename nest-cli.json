@@ -1,31 +1,31 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/gk-mensah-live-engine/src",
+  "sourceRoot": "apps/gateway/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/gk-mensah-live-engine/tsconfig.app.json"
+    "tsConfigPath": "apps/gateway/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/gk-mensah-live-engine",
+  "root": "apps/gateway",
   "projects": {
-    "auth": {
+    "core": {
       "type": "application",
-      "root": "apps/auth",
+      "root": "apps/core",
       "entryFile": "main",
-      "sourceRoot": "apps/auth/src",
+      "sourceRoot": "apps/core/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/auth/tsconfig.app.json"
+        "tsConfigPath": "apps/core/tsconfig.app.json"
       }
     },
-    "gk-mensah-live-engine": {
+    "gateway": {
       "type": "application",
-      "root": "apps/gk-mensah-live-engine",
+      "root": "apps/gateway",
       "entryFile": "main",
-      "sourceRoot": "apps/gk-mensah-live-engine/src",
+      "sourceRoot": "apps/gateway/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/gk-mensah-live-engine/tsconfig.app.json"
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
       }
     },
     "lib": {

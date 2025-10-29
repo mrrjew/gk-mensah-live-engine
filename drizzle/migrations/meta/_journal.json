@@ -29,6 +29,13 @@
       "when": 1752417780562,
       "tag": "0003_quick_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1761004676989,
+      "tag": "0004_peaceful_silver_surfer",
+      "breakpoints": true
     }
   ]
 }
