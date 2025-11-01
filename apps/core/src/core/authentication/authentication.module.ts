@@ -10,7 +10,7 @@ import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports:[DrizzleModule,HashModule,JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_SECRET || 'defaultsecret',
       signOptions: { expiresIn: '1d' },
     }),PassportModule.register({ defaultStrategy: 'local' }),
 ],

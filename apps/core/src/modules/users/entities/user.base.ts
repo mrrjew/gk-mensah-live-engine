@@ -31,6 +31,7 @@ export const userTable = {
   updatedAt: timestamp("updated_at").defaultNow().$onUpdateFn(() => new Date()),
   lastLogin: timestamp("last_login").defaultNow(),
   isActive: boolean("is_active").default(true),
+  isSubscribed: boolean("is_subscribed").default(false),
   isEmailVerified: boolean("is_email_verified").default(false),
 };
 

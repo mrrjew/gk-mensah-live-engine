@@ -68,9 +68,9 @@ export class UsersResolver {
    * Update user details
    */
   @Mutation(() => User)
-  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+  async updateUser(@Args('input') input: UpdateUserInput) {
     return lastValueFrom(
-      this.coreService.send({ service: 'users', cmd: 'updateUser' }, updateUserInput)
+      this.coreService.send({ service: 'users', cmd: 'updateUser' }, input)
     );
   }
 

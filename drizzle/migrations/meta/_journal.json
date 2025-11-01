@@ -36,6 +36,34 @@
       "when": 1761004676989,
       "tag": "0004_peaceful_silver_surfer",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1761929305070,
+      "tag": "0005_flimsy_bastion",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1761930589954,
+      "tag": "0006_broken_tempest",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1762025851466,
+      "tag": "0007_bright_maverick",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1762031480230,
+      "tag": "0008_talented_clint_barton",
+      "breakpoints": true
     }
   ]
 }

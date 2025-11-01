@@ -7,12 +7,12 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: process.env.CORE_HOST || 'localhost',
-      port: parseInt(process.env.CORE_PORT || '3001'),
+      port: parseInt(process.env.CORE_PORT || '3003'),
     },
   });
 
 
-  console.log(`Core microservice is running on port ${process.env.CORE_PORT || 3001}`);
+  console.log(`Core microservice is running on port ${process.env.CORE_PORT || 3003}`);
 
   console.log('📡 Registered message handlers:', app['messageHandlers']);
 

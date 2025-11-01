@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
-import { AuthenticationService } from '../../core/authentication/authentication.service';
 
 @Injectable()
 export class GoogleOauthStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthenticationService) {
+  constructor(@Inject('CORE_SERVICE') private coreService: ClientProxy) {
     super({
       clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
@@ -23,7 +23,7 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy) {
         phoneNumber:profile.phoneNumber
       };
       console.log(access_token);
-      const user = await this.authService?.validateThirdParty(payload);
+      const user = await this.coreService.send('validateThirdParty',payload);
 
       return user || null;
     } catch (err) {
