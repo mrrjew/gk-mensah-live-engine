@@ -1,8 +1,8 @@
 CREATE TYPE "public"."user_type" AS ENUM('SuperAdmin', 'Admin', 'User');--> statement-breakpoint
 CREATE TYPE "public"."subscription_feature" AS ENUM('LIVE_MEETINGS', 'REPLAY_ACCESS', 'STANDARD_SUPPORT', 'PRIORITY_SUPPORT', 'EXCLUSIVE_SESSIONS', 'PRIVATE_COMMUNITY', 'BASIC_SUPPORT');--> statement-breakpoint
-CREATE TYPE "public"."payment_status_enum" AS ENUM('PENDING', 'REJECTED', 'APPROAVED');--> statement-breakpoint
-CREATE TABLE "user" (
-	"id" serial PRIMARY KEY NOT NULL,
+CREATE TYPE "public"."payment_status_enum" AS ENUM('PENDING', 'REJECTED', 'APPROVED');--> statement-breakpoint
+CREATE TABLE "users" (
+	"id" varchar(255) PRIMARY KEY NOT NULL,
 	"username" text NOT NULL,
 	"email" text NOT NULL,
 	"phone_number" text DEFAULT '',
@@ -58,17 +58,17 @@ CREATE TABLE "user" (
 );
 --> statement-breakpoint
 CREATE TABLE "memberships" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
-	"subscription_id" integer NOT NULL,
-	"start_date" timestamp DEFAULT now() NOT NULL,
+	"id" varchar(255) PRIMARY KEY NOT NULL,
+	"user_id" varchar NOT NULL,
+	"subscription_id" varchar NOT NULL,
+	"start_date" timestamp NOT NULL,
 	"end_date" timestamp NOT NULL,
-	"is_active" boolean DEFAULT true,
+	"is_active" boolean DEFAULT false,
 	"payment_reference" varchar
 );
 --> statement-breakpoint
 CREATE TABLE "subscriptions" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" varchar(255) PRIMARY KEY NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"description" text NOT NULL,
 	"price" integer NOT NULL,
@@ -80,17 +80,16 @@ CREATE TABLE "subscriptions" (
 );
 --> statement-breakpoint
 CREATE TABLE "payments" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" varchar(255) PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"email" varchar(255) NOT NULL,
-	"order_id" varchar(255) NOT NULL,
+	"membership_id" varchar NOT NULL,
 	"amount" varchar(50) NOT NULL,
 	"method" varchar(100) NOT NULL,
 	"status" varchar(50),
-	"recurring" boolean DEFAULT false,
-	"payment_date" varchar(100) NOT NULL,
-	"is_valid_until" varchar(100) NOT NULL
+	"payment_date" varchar(100) NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "memberships" ADD CONSTRAINT "memberships_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "memberships" ADD CONSTRAINT "memberships_subscription_id_subscriptions_id_fk" FOREIGN KEY ("subscription_id") REFERENCES "public"."subscriptions"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "memberships" ADD CONSTRAINT "memberships_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "memberships" ADD CONSTRAINT "memberships_subscription_id_subscriptions_id_fk" FOREIGN KEY ("subscription_id") REFERENCES "public"."subscriptions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "payments" ADD CONSTRAINT "payments_membership_id_memberships_id_fk" FOREIGN KEY ("membership_id") REFERENCES "public"."memberships"("id") ON DELETE no action ON UPDATE no action;

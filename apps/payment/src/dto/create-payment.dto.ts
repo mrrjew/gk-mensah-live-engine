@@ -2,11 +2,9 @@ export class CreatePaymentDto {
     amount: number;
     method: string;
     email: string
-    membershipId: number;
-    userId: number;
-    paymentDate: string
-    isValidUntil: string;
-    recurring?: boolean;
+    membershipId: string;
+    userId: string;
+    paymentDate: Date;
     callback_url: string;
     reference?: string;
 }

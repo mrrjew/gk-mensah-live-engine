@@ -27,7 +27,7 @@ export class PaymentService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const [payment] = await this.drizzleService.db
         .select()
@@ -40,7 +40,7 @@ export class PaymentService {
     }
   }
 
-  async update(id: number, updatePaymentDto: UpdatePaymentDto) {
+  async update(id: string, updatePaymentDto: UpdatePaymentDto) {
     try {
       await this.drizzleService.db
         .update(Payments)
@@ -52,7 +52,7 @@ export class PaymentService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     try {
       await this.drizzleService.db.delete(Payments).where(eq(Payments.id, id));
       return { message: `Payment ${id} removed successfully` };

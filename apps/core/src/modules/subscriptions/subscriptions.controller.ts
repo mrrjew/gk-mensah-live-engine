@@ -32,7 +32,7 @@ export class SubscriptionsController {
   }
 
   @MessagePattern({ service: 'subscriptions', cmd: 'findOne' })
-  async findOne(data: { id: number }) {
+  async findOne(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
     return this.subscriptionsService.findOne(data.id);
   }
@@ -44,7 +44,7 @@ export class SubscriptionsController {
   }
 
   @MessagePattern({ service: 'subscriptions', cmd: 'remove' })
-  async remove(data: { id: number }) {
+  async remove(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
     return this.subscriptionsService.remove(data.id);
   }

@@ -18,7 +18,7 @@ export class SubscriptionsResolver {
   }
 
   @Query(() => Subscription)
-  async subscription(@Args('id', { type: () => Int }) id: number) {
+  async subscription(@Args('id', { type: () => String }) id: string) {
     return await lastValueFrom(
       this.coreClient.send({ service: 'subscriptions', cmd: 'findOne' }, { id }),
     );
@@ -41,7 +41,7 @@ export class SubscriptionsResolver {
   }
 
   @Mutation(() => StringResponse)
-  async removeSubscription(@Args('id', { type: () => Int }) id: number) {
+  async removeSubscription(@Args('id', { type: () => String }) id: string) {
     return await lastValueFrom(
       this.coreClient.send({ service: 'subscriptions', cmd: 'remove' }, { id }),
     );

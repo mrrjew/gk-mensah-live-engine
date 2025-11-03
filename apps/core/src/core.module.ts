@@ -6,9 +6,10 @@ import { DrizzleModule } from 'libs/core/src/drizzle';
 import { UsersModule } from './modules/users/users.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { MembershipsModule } from './modules/memberships/memberships.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [AuthenticationModule,DrizzleModule, UsersModule,SubscriptionsModule,MembershipsModule],
+  imports: [ScheduleModule.forRoot(),AuthenticationModule,DrizzleModule, UsersModule,SubscriptionsModule,MembershipsModule],
   controllers: [CoreController],
   providers: [CoreService],
 })

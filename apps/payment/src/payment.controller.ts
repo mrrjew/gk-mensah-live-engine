@@ -44,11 +44,11 @@ export class PaymentController {
       reference: 'fcff7f8d-bb60-4854-8c89-0555883db81e',
     },
   })
-  async initializePayment(createPaymentDto: any) {
+  async initializePayment(createPaymentDto: CreatePaymentDto) {
     try {
       const {
         email,
-        signedUserId: userId,
+        userId,
         membershipId,
         method,
         paymentDate,
@@ -79,12 +79,14 @@ export class PaymentController {
           email,
           userId,
           membershipId,
-          paymentDate,
+          paymentDate: new Date(paymentDate),
           amount: String(subscription[0].price),
           status: 'PENDING',
           method,
         })
-        .returning({ id: Payments.id });
+        .returning();
+
+        console.log('Created payment record:', payment);  
 
       const data = {
         email,
@@ -145,7 +147,7 @@ export class PaymentController {
         const membership = await this.drizzleService.db
           .select()
           .from(Memberships)
-          .where(eq(Memberships.id, parseInt(data.metadata.membershipId)));
+          .where(eq(Memberships.id, data.metadata.membershipId));
 
         if (!membership.length) {
           throw new BadRequestException('Membership does not exist');
@@ -157,14 +159,14 @@ export class PaymentController {
             paymentReference: reference,
             isActive: true,
           })
-          .where(eq(Memberships.id, parseInt(data.metadata.membershipId)));
+          .where(eq(Memberships.id, data.metadata.membershipId));
 
         await this.drizzleService.db
           .update(Payments)
           .set({
             status: 'APPROVED',
           })
-          .where(eq(Payments.id, parseInt(data.metadata.paymentId)));
+          .where(eq(Payments.id, data.metadata.paymentId));
 
         return { message: 'Payment verified successfully' };
       } else {
@@ -177,4 +179,42 @@ export class PaymentController {
       );
     }
   }
+
+
+  @MessagePattern({ cmd: 'get_payments' })
+  async getPayments(id: string) {
+    const payment = await this.drizzleService.db
+      .select()
+      .from(Payments);
+    if (!payment.length) {
+      throw new BadRequestException('No payments found');
+    }
+    return payment;
+  }
+
+  @MessagePattern({ cmd: 'get_payment' })
+  async getPayment(id: string) {
+    const payment = await this.drizzleService.db
+      .select()
+      .from(Payments)
+      .where(eq(Payments.id, id));
+    if (!payment.length) {
+      throw new BadRequestException('Payment not found');
+    }
+    return payment[0];
+  }
+
+  @MessagePattern({ cmd: 'get_payments_by_user' })
+  async getPaymentsByUser(userId: string) {
+    const payments = await this.drizzleService.db
+      .select()
+      .from(Payments)
+      .where(eq(Payments.userId, userId));
+    if (!payments.length) {
+      throw new BadRequestException('No payments found for this user');
+    }
+    return payments;
+  }
+
+  
 }

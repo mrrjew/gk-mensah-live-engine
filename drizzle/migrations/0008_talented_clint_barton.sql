@@ -1,1 +1,0 @@
-ALTER TABLE "payments" ALTER COLUMN "membership_id" SET DATA TYPE integer;

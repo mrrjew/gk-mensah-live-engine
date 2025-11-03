@@ -19,8 +19,8 @@ registerEnumType(SubscriptionFeature, {
 
 @ObjectType()
 export class Subscription {
-  @Field(() => Int)
-  id: number;
+  @Field(() => String)
+  id: string;
 
   @Field()
   @IsString()
@@ -32,7 +32,7 @@ export class Subscription {
   @IsNotEmpty()
   description: string;
 
-  @Field(() => Int)
+  @Field(() => String)
   @IsInt()
   price: number;
 

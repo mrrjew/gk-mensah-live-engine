@@ -1,14 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable,Logger, NotFoundException } from '@nestjs/common';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
 import { Memberships } from './entities/memberships.entities';
-import { eq } from 'drizzle-orm';
+import { eq,and,lte } from 'drizzle-orm';
 import { DrizzleService } from '@app/lib/core/drizzle';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class MembershipsService {
+private readonly logger = new Logger(MembershipsService.name);
+
 constructor(private readonly drizzleService: DrizzleService) {}
   async create(createMembershipDto: CreateMembershipDto) {
+    console.log('Creating membership with DTO:', createMembershipDto);
     const membership = await this.drizzleService.db
       .insert(Memberships)
       .values({...createMembershipDto,
@@ -16,6 +20,7 @@ constructor(private readonly drizzleService: DrizzleService) {}
         endDate: new Date(createMembershipDto.endDate ?? ''),
       })
       .returning();
+      console.log('Created membership:', membership);
     return membership[0];
   }
 
@@ -23,7 +28,7 @@ constructor(private readonly drizzleService: DrizzleService) {}
     return await this.drizzleService.db.select().from(Memberships);
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const membership = await this.drizzleService.db
       .select()
       .from(Memberships)
@@ -33,7 +38,7 @@ constructor(private readonly drizzleService: DrizzleService) {}
     return membership[0];
   }
 
-  async findByUser(userId: number) {
+  async findByUser(userId: string) {
     const membership = await this.drizzleService.db
       .select()
       .from(Memberships)
@@ -41,7 +46,23 @@ constructor(private readonly drizzleService: DrizzleService) {}
     return membership;
   }
 
-  async update(id: number, updateMembershipDto: UpdateMembershipDto) {
+  async findBySubscription(subscriptionId: string) {
+    const membership = await this.drizzleService.db
+      .select()
+      .from(Memberships)
+      .where(eq(Memberships.subscriptionId, subscriptionId));
+    return membership;
+  }
+
+  async findActiveByUser(userId: string) {
+    const membership = await this.drizzleService.db
+      .select()
+      .from(Memberships)
+      .where(and(eq(Memberships.userId, userId),eq(Memberships.isActive, true)))
+    return membership;
+  }
+
+  async update(id: string, updateMembershipDto: UpdateMembershipDto) {
     const updated = await this.drizzleService.db
       .update(Memberships)
       .set({...updateMembershipDto,
@@ -54,7 +75,7 @@ constructor(private readonly drizzleService: DrizzleService) {}
     return updated[0];
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const deleted = await this.drizzleService.db
       .delete(Memberships)
       .where(eq(Memberships.id, id))
@@ -63,11 +84,22 @@ constructor(private readonly drizzleService: DrizzleService) {}
     return { message: 'Membership deleted successfully' };
   }
 
+  @Cron(CronExpression.EVERY_MINUTE)
   async deactivateExpiredMemberships() {
     const now = new Date();
-    await this.drizzleService.db
+
+    this.logger.log(`Checking for expired memberships as of ${now.toISOString()}...`);
+
+    const result = await this.drizzleService.db
       .update(Memberships)
       .set({ isActive: false })
-      .where(eq(Memberships.endDate, now));
+      .where(
+        and(
+          lte(Memberships.endDate, now),
+          eq(Memberships.isActive, true)
+        )
+      );
+
+    this.logger.log(`Deactivated ${result.rowCount ?? 0} expired memberships.`);
   }
 }

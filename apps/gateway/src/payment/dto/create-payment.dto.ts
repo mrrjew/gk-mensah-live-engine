@@ -1,4 +1,31 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, GraphQLISODateTime, ObjectType } from '@nestjs/graphql';
+
+@ObjectType()
+export class Payment {
+  @Field()
+  id: string;
+
+  @Field()
+  email: string;
+
+  @Field()
+  userId: string;
+
+  @Field()
+  membershipId: string;
+
+  @Field()
+  method: string;
+
+  @Field()
+  paymentDate: string;
+
+  @Field()
+  callback_url: string;
+
+  @Field({nullable: true})
+  reference: string;
+}
 
 @InputType()
 export class CreatePaymentInput {
@@ -6,13 +33,16 @@ export class CreatePaymentInput {
   email: string;
 
   @Field()
-  membershipId: number;
+  userId: string;
+
+  @Field()
+  membershipId: string;
 
   @Field()
   method: string;
 
-  @Field()
-  paymentDate: string;
+  @Field(() => GraphQLISODateTime)
+  paymentDate: Date;
 
   @Field()
   callback_url: string;

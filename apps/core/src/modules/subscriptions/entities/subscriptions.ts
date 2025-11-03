@@ -10,6 +10,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { Memberships } from '../../memberships/entities/memberships.entities';
+import { createId } from '@paralleldrive/cuid2';
 
 // Enum for features
 export const subscriptionFeatureEnum = pgEnum('subscription_feature', [
@@ -24,7 +25,11 @@ export const subscriptionFeatureEnum = pgEnum('subscription_feature', [
 
 // Main table
 export const Subscriptions = pgTable('subscriptions', {
-  id: serial('id').primaryKey(),
+    id: 
+        varchar({ length: 255 })
+        .primaryKey()
+        .$defaultFn(() => createId())
+        .notNull(),
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description').notNull(),
   price: integer('price').notNull(),

@@ -3,7 +3,7 @@ import { Inject, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { PaymentResponse, VerifyResponse } from './dto/payyment-response.dto';
-import { CreatePaymentInput } from './dto/create-payment.dto';
+import { CreatePaymentInput, Payment } from './dto/create-payment.dto';
 import { CurrentUser } from '../core/common/decorators/current-user.decorator';
 
 @Resolver()
@@ -51,6 +51,47 @@ export class PaymentResolver {
     }
   }
 
+  @Query(() => Payment)
+  async payment(
+    @Args('paymentId', { type: () => String }) paymentId: string,
+  ): Promise<Payment> {
+    try {
+      const response = await lastValueFrom(
+        this.paymentClient.send({ cmd: 'get_payment' }, paymentId),
+      );
+      return response;
+    } catch (err) {
+      throw new Error(`Failed to get payment: ${err.message}`);
+    }
+  }
+
+  @Query(() => [Payment])
+  async payments(): Promise<Payment> {
+    try {
+      const response = await lastValueFrom(
+        this.paymentClient.send({ cmd: 'get_payments' }, {}),
+      );
+      console.log('Payments response:', response);
+      return response;
+    } catch (err) {
+      throw new Error(`Failed to get payment: ${err.message}`);
+    }
+  }
+
+  @Query(() => [Payment])
+  async paymentsByUser(
+    @Args('userId', { type: () => String }) userId: string,
+  ): Promise<Payment[]> {
+    try {
+      const response = await lastValueFrom(
+        this.paymentClient.send({ cmd: 'get_payments_by_user' }, userId),
+      );
+      return response;
+    } catch (err) {
+      throw new Error(`Failed to get payments by user: ${err.message}`);
+    }
+  }
+
   @Query(() => String)
   async pingPayments() : Promise<String> {
     try {
@@ -62,4 +103,5 @@ export class PaymentResolver {
       throw new Error(`Ping failed: ${err.message}`);
     }
   }
+
 }

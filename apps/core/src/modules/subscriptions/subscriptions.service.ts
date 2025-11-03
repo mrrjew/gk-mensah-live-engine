@@ -32,7 +32,7 @@ export class SubscriptionsService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const [subscription] = await this.drizzleService.db
         .select()
@@ -46,7 +46,7 @@ export class SubscriptionsService {
     }
   }
 
-  async update(id: number, dto: UpdateSubscriptionDto) {
+  async update(id: string, dto: UpdateSubscriptionDto) {
     try {
       await this.drizzleService.db
         .update(Subscriptions)
@@ -59,7 +59,7 @@ export class SubscriptionsService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     try {
       await this.drizzleService.db
         .delete(Subscriptions)

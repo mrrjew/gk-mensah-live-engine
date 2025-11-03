@@ -17,22 +17,38 @@ export class MembershipsResolver {
   }
 
   @Query(() => Membership)
-  async membership(@Args('id', { type: () => Int }) id: number) {
+  async membership(@Args('id', { type: () => String }) id: string) {
     return await lastValueFrom(
       this.coreClient.send({ service: 'memberships', cmd: 'findOne' }, { id }),
     );
   }
 
   @Query(() => [Membership])
-  async membershipsByUser(@Args('userId', { type: () => Int }) userId: number) {
+  async membershipsBySubscription(@Args('subscriptionId', { type: () => String }) subscriptionId: string) {
+    return await lastValueFrom(
+      this.coreClient.send({ service: 'memberships', cmd: 'findBySubscription' }, { subscriptionId }),
+    );
+  }
+
+
+  @Query(() => [Membership])
+  async membershipsByUser(@Args('userId', { type: () => String }) userId: string) {
     return await lastValueFrom(
       this.coreClient.send({ service: 'memberships', cmd: 'findByUser' }, { userId }),
+    );
+  }
+
+  @Query(() => Membership)
+  async activeMembershipByUser(@Args('userId', { type: () => String }) userId: string) {
+    return await lastValueFrom(
+      this.coreClient.send({ service: 'memberships', cmd: 'findActiveByUser' }, { userId }),
     );
   }
 
   @Mutation(() => Membership)
   async createMembership(@Args('input') input: CreateMembershipInput) {
     // Optionally auto-calc endDate based on subscription duration
+    console.log('Creating membership with input:', input);
     const membership = await lastValueFrom(
       this.coreClient.send({ service: 'memberships', cmd: 'create' }, input),
     );
@@ -49,9 +65,16 @@ export class MembershipsResolver {
   }
 
   @Mutation(() => Boolean)
-  async removeMembership(@Args('id', { type: () => Int }) id: number) {
+  async removeMembership(@Args('id', { type: () => String }) id: string) {
     return await lastValueFrom(
       this.coreClient.send({ service: 'memberships', cmd: 'remove' }, { id }),
     );
   }
+
+  @Query(() => String)
+  async  deactivateExpiredMemberships() {
+    return await lastValueFrom(
+      this.coreClient.send({ service: 'memberships', cmd: 'deactivateExpiredMemberships' }, {}),
+    );
+  } 
 }

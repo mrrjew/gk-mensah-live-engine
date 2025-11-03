@@ -27,26 +27,33 @@ export class AuthenticationService {
 
     async createUser(payload:CreateUserDto) {
         try {
+            console.log('Received createUser payload1:', payload);
             const existingUser = await this.drizzleService.db
-                .select()
-                .from(Users)
+            .select()
+            .from(Users)
                 .where(eq(Users.email,payload.email));
 
+            console.log('Received createUser payload1.2:', payload);
             if (existingUser.length > 0) {
                 throw new BadRequestException('User already exists');
             }
-
+            console.log('Received createUser payload1.3:', payload);
+            
             // Validate required fields
             if (!payload.username || !payload.email || !payload.password) {
                 throw new BadRequestException('Username, email, and password are required');
             }
-
+            console.log('Received createUser payload1.4:', payload);
+            
             // Hash the password
             payload.password = await this.hashService.hashPassword(payload.password);
             const _payload = {...payload,password:payload.password,createdAt:new Date(),updatedAt:new Date()};
+            console.log('Received createUser payload1.5:', payload);
             // Create the user
+            console.log('Creating user with payload:', _payload);
             const user = await this.drizzleService.db.insert(Users).values(_payload).returning();
-
+            console.log('User created successfully:', user);
+            console.log('Received createUser payload1.5 :', payload);
             return this.generateToken(user[0]);
         } catch (error) {
             console.error('User creation failed:', error.response);

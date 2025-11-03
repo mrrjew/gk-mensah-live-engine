@@ -18,6 +18,7 @@ export class MembershipsController {
   @MessagePattern({ service: 'memberships', cmd: 'create' })
   async create(createMembershipDto: CreateMembershipDto) {
     try {
+      console.log('Received createMembershipDto:', createMembershipDto);
       return await this.membershipsService.create(createMembershipDto);
     } catch (err) {
       console.error('Error creating membership:', err);
@@ -36,7 +37,7 @@ export class MembershipsController {
   }
 
   @MessagePattern({ service: 'memberships', cmd: 'findOne' })
-  async findOne(data: { id: number }) {
+  async findOne(data: { id: string }) {
     try {
       if (!data?.id) throw new RpcException('Missing membership ID');
       return await this.membershipsService.findOne(data.id);
@@ -47,7 +48,7 @@ export class MembershipsController {
   }
 
   @MessagePattern({ service: 'memberships', cmd: 'findByUser' })
-  async findByUser(data: { userId: number }) {
+  async findByUser(data: { userId: string }) {
     try {
       if (!data?.userId) throw new RpcException('Missing user ID');
       return await this.membershipsService.findByUser(data.userId);
@@ -57,8 +58,30 @@ export class MembershipsController {
     }
   }
 
+  @MessagePattern({ service: 'memberships', cmd: 'findBySubscription' })
+  async findBySubscription(data: { subscriptionId: string }) {
+    try {
+      if (!data?.subscriptionId) throw new RpcException('Missing subscription ID');
+      return await this.membershipsService.findBySubscription(data.subscriptionId);
+    } catch (err) {
+      console.error('Error finding subscription memberships:', err);
+      throw new RpcException(err?.message || 'Failed to fetch subscription memberships');
+    }
+  }
+
+  @MessagePattern({ service: 'memberships', cmd: 'findActiveByUser' })
+  async findActiveByUser(data: { userId: string }) {
+    try {
+      if (!data?.userId) throw new RpcException('Missing user ID');
+      return await this.membershipsService.findActiveByUser(data.userId);
+    } catch (err) {
+      console.error('Error finding active user memberships:', err);
+      throw new RpcException(err?.message || 'Failed to fetch active user memberships');
+    }
+  }
+
   @MessagePattern({ service: 'memberships', cmd: 'update' })
-  async update(updateMembershipDto: UpdateMembershipDto & { id: number }) {
+  async update(updateMembershipDto: UpdateMembershipDto & { id: string }) {
     try {
       if (!updateMembershipDto?.id) throw new RpcException('Missing membership ID');
       return await this.membershipsService.update(updateMembershipDto.id, updateMembershipDto);
@@ -69,7 +92,7 @@ export class MembershipsController {
   }
 
   @MessagePattern({ service: 'memberships', cmd: 'remove' })
-  async remove(data: { id: number }) {
+  async remove(data: { id: string }) {
     try {
       if (!data?.id) throw new RpcException('Missing membership ID');
       return await this.membershipsService.remove(data.id);

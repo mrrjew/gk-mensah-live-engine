@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import {
   pgTable,
   serial,
@@ -6,7 +7,8 @@ import {
   boolean,
   integer,
   jsonb,
-  pgEnum
+  pgEnum,
+  varchar
 } from "drizzle-orm/pg-core";
 
 export const UserRoles = [
@@ -19,7 +21,11 @@ export type UserRole = typeof UserRoles[number]
 export const UserRole = pgEnum('user_type', [UserRoles[0]!, ...UserRoles.slice(1)])
 
 export const userTable = {
-  id: serial("id").primaryKey(),
+  id: 
+        varchar({ length: 255 })
+        .primaryKey()
+        .$defaultFn(() => createId())
+        .notNull(),
   username: text("username").notNull(),
   email: text("email").notNull(),
   phoneNumber: text("phone_number").default(''),

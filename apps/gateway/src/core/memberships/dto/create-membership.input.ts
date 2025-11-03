@@ -2,20 +2,20 @@ import { Field, InputType, Int, ObjectType, GraphQLISODateTime } from '@nestjs/g
 
 @ObjectType()
 export class Membership {
-  @Field(() => Int)
-  id: number;
+  @Field(() => String)
+  id: string;
 
-  @Field(() => Int)
-  userId: number;
+  @Field(() => String)
+  userId: string;
 
-  @Field(() => Int)
-  subscriptionId: number;
+  @Field(() => String)
+  subscriptionId: string;
 
-  @Field(() => GraphQLISODateTime)
-  startDate: Date;
+  @Field()
+  startDate:string
 
-  @Field(() => GraphQLISODateTime)
-  endDate: Date;
+  @Field()
+  endDate: string;
 
   @Field({ nullable: true })
   paymentReference?: string;
@@ -26,11 +26,11 @@ export class Membership {
 
 @InputType()
 export class CreateMembershipInput {
-  @Field(() => Int)
-  userId: number;
+  @Field(() => String)
+  userId: string;
 
-  @Field(() => Int)
-  subscriptionId: number;
+  @Field(() => String)
+  subscriptionId: string;
 
   @Field(() => GraphQLISODateTime)
   startDate: Date;

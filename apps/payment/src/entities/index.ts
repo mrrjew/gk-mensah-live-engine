@@ -1,24 +1,30 @@
+import { createId } from "@paralleldrive/cuid2";
+import { Memberships } from "apps/core/src/modules/memberships/entities/memberships.entities";
 import { Users } from "apps/core/src/modules/users/entities";
 import { relations } from "drizzle-orm";
-import { pgTable, serial, varchar,integer,boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar,integer,boolean, pgEnum, timestamp } from "drizzle-orm/pg-core";
 
 export const PaymentStatusEnums = [
     'PENDING',
     'REJECTED',
-    'APPROAVED'
+    'APPROVED'
 ]
 
 export const PaymentStatusEnum = pgEnum('payment_status_enum',[PaymentStatusEnums[0],...PaymentStatusEnums.slice(1)])
 
 export const Payments = pgTable('payments', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').notNull(),
+    id: 
+        varchar({ length: 255 })
+        .primaryKey()
+        .$defaultFn(() => createId())
+        .notNull(),
+  userId: varchar('user_id').notNull(),
   email: varchar('email', { length: 255 }).notNull(),
-  membershipId: integer('membership_id').notNull(),
+  membershipId: varchar('membership_id').references(() => Memberships.id).notNull(),
   amount: varchar('amount', { length: 50 }).notNull(),
   method: varchar('method', { length: 100 }).notNull(),
   status: varchar('status', { length: 50 }),
-  paymentDate: varchar('payment_date', { length: 100 }).notNull(),
+  paymentDate: timestamp('payment_date',{mode:'date'}).notNull(),
 });
 
 export type Payment = typeof Payments.$inferSelect;
