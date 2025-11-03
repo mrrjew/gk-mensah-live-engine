@@ -1,6 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Version, VersioningType } from '@nestjs/common';
+import { ValidationPipe, Version, VersioningType } from '@nestjs/common';
 import { ApiVersion } from 'apps/gateway/src/core/common/constants/app';
 import { JwtGuard } from './core/common/guards/jwt.guard';
 
@@ -15,6 +15,12 @@ async function bootstrap() {
   })
 
   app.setGlobalPrefix('api')
+
+  app.useGlobalPipes(
+  new ValidationPipe({
+    transform: true, // 👈 ensures plain strings become proper Date objects
+  }),
+);
 
   app.useGlobalGuards(new JwtGuard(app.get(Reflector)));
 

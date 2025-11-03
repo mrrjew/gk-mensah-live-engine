@@ -25,9 +25,9 @@ export class AuthenticationResolver {
     
     @Mutation(() => Auth, { name: 'createUser' })
     @Public()
-    async createUser(@Args('createUserInput') createUserInput: CreateUserInput): Promise<User> {
+    async createUser(@Args('input') input: CreateUserInput): Promise<User> {
     try {
-        const user = await lastValueFrom(this.coreService.send<User>({service:'authentication',cmd:'createUser'}, createUserInput));
+        const user = await lastValueFrom(this.coreService.send<User>({service:'authentication',cmd:'createUser'}, input));
         return user;
     } catch (error) {
             const errorResponse = error.response;
@@ -42,9 +42,9 @@ export class AuthenticationResolver {
 
 @Mutation(() => Auth, { name: 'loginUser' })
 @Public()
-async loginUser(@Args('loginInput') loginInput:LoginInput): Promise<Auth> {
+async loginUser(@Args('loginInput') input:LoginInput): Promise<Auth> {
     try {
-        const auth = await lastValueFrom(this.coreService.send<Auth>({service:'authentication',cmd:'loginUser'}, loginInput));
+        const auth = await lastValueFrom(this.coreService.send<Auth>({service:'authentication',cmd:'loginUser'}, input));
         return auth;
     } catch (error) {
         console.error("loginUser error: ", error.message);

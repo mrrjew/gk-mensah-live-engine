@@ -58,7 +58,7 @@ export class UsersResolver {
    * Returns a specific user by ID
    */
   @Query(() => User, { name: 'user' })
-  async findOne(@Args('id', { type: () => Int }) id: number) {
+  async findOne(@Args('id', { type: () => String }) id: string) {
     return lastValueFrom(
       this.coreService.send({ service: 'users', cmd: 'findOne' }, { id })
     );
@@ -68,9 +68,9 @@ export class UsersResolver {
    * Update user details
    */
   @Mutation(() => User)
-  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+  async updateUser(@Args('input') input: UpdateUserInput) {
     return lastValueFrom(
-      this.coreService.send({ service: 'users', cmd: 'updateUser' }, updateUserInput)
+      this.coreService.send({ service: 'users', cmd: 'updateUser' }, input)
     );
   }
 
@@ -78,7 +78,7 @@ export class UsersResolver {
    * Remove user by ID
    */
   @Mutation(() => User)
-  async removeUser(@Args('id', { type: () => Int }) id: number) {
+  async removeUser(@Args('id', { type: () => String }) id: string) {
     return lastValueFrom(
       this.coreService.send({ service: 'users', cmd: 'removeUser' }, { id })
     );

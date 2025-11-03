@@ -35,7 +35,7 @@ export class UsersController {
   }
 
   @MessagePattern({ service: 'users', cmd: 'findOne' })
-  async findOne(data: { id: number }) {
+  async findOne(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
     return this.usersService.findOne(data.id);
   }
@@ -47,7 +47,7 @@ export class UsersController {
   }
 
   @MessagePattern({ service: 'users', cmd: 'removeUser' })
-  async remove(data: { id: number }) {
+  async remove(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
     return this.usersService.remove(data.id);
   }

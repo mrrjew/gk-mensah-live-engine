@@ -9,7 +9,6 @@ export class JwtMiddleware implements NestMiddleware {
 
   use(req: Request, _res: Response, next: NextFunction) {
     try {
-      console.log('🔥 JwtMiddleware running');
       const auth = req.headers.authorization as string | undefined;
       if (!auth?.startsWith('Bearer ')) {
         req['user'] = {};
@@ -17,12 +16,8 @@ export class JwtMiddleware implements NestMiddleware {
       }
 
       const token = auth.split(' ')[1];
-      console.log(`Token: ${token}`)
-      console.log(this.configService.get<string>('JWT_SECRET'))
       const payload = this.jwtService.verify(token,{secret:this.configService.get<string>('JWT_SECRET')});
-      console.log(`Payload: ${JSON.stringify(payload)}`)
       req['user'] = payload;
-      console.log("Req User",req.user)
     } catch (err) {
       console.error('❌ JWT verification failed:', err.message);
       req['user'] = {};

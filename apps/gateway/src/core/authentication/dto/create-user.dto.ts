@@ -3,8 +3,8 @@ import { GraphQLJSON } from 'graphql-type-json';
 
 @ObjectType()
 export class User {
-  @Field(() => Int)
-  id: number;
+  @Field(() => String)
+  id: string;
 
   @Field()
   username: string;

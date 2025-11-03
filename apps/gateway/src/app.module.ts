@@ -6,6 +6,8 @@ import { GraphInspector } from '@nestjs/core';
 import { GraphQLModule as Graph } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { CoreModule } from './core/core.module';
+import { PaymentModule } from './payment/payment.module';
+import { MicroserviceClientsModule } from './microservice.clients.config/microservice-clients.module';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { CoreModule } from './core/core.module';
       introspection: true,
       plugins: [GraphInspector],
     }),
-    CoreModule
+    CoreModule,
+    PaymentModule,
+    MicroserviceClientsModule
   ],
   controllers: [AppController],
   providers: [AppService],
