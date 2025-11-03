@@ -9,6 +9,8 @@
     "start:gateway": "nest start gateway --watch",
     "start:core": "nest start core --watch",
     "start:payment": "nest start payment --watch",
+    "start:core:prod": "nest start core",
+    "start:payment:prod": "nest start payment",
     "start:all": "concurrently \"npm run start:gateway\" \"npm run start:core\" \"npm run start:payment\"",
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
