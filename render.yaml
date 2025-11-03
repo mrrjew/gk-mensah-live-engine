@@ -1,0 +1,85 @@
+databases:
+  - name: neondb
+    plan: free
+    databaseName: neondb
+    user: neondb_owner
+
+services:
+  # 🌐 Gateway Service (entry point for all clients)
+  - type: web
+    name: gateway
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node dist/apps/gateway/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: GATEWAY_PORT
+        value: 3000
+      - key: GATEWAY_HOST
+        value: gateway
+      - key: CORE_HOST
+        value: core
+      - key: CORE_PORT
+        value: 3003
+      - key: PAYMENT_HOST
+        value: payment
+      - key: PAYMENT_PORT
+        value: 3002
+      - key: DATABASE_URL
+        fromDatabase:
+          name: neondb
+          property: connectionString
+      - key: JWT_SECRET
+        value: 12efa383b1234c5d6e7f8901234567890
+      - key: PAYSTACK_SECRET_KEY
+        value: sk_test_b5b172ed987010b37ee78d85641ea8891a68049b
+
+  # ⚙️ Core Microservice
+  - type: worker
+    name: core
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node dist/apps/core/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3003
+      - key: CORE_PORT
+        value: 3003
+      - key: CORE_HOST
+        value: core
+      - key: DATABASE_URL
+        fromDatabase:
+          name: neondb
+          property: connectionString
+      - key: JWT_SECRET
+        value: 12efa383b1234c5d6e7f8901234567890
+
+  # 💳 Payment Microservice
+  - type: worker
+    name: payment
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node dist/apps/payment/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3002
+      - key: PAYMENT_PORT
+        value: 3002
+      - key: PAYMENT_HOST
+        value: payment
+      - key: DATABASE_URL
+        fromDatabase:
+          name: neondb
+          property: connectionString
+      - key: PAYSTACK_SECRET_KEY
+        value: sk_test_b5b172ed987010b37ee78d85641ea8891a68049b
