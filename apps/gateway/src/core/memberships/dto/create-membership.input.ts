@@ -32,12 +32,6 @@ export class CreateMembershipInput {
   @Field(() => String)
   subscriptionId: string;
 
-  @Field(() => GraphQLISODateTime)
-  startDate: Date;
-
-  @Field(() => GraphQLISODateTime)
-  endDate: Date;
-
   @Field({ nullable: true })
   paymentReference?: string;
 

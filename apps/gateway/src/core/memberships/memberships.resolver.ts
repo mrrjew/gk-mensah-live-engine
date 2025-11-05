@@ -1,80 +1,98 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
-import { CreateMembershipInput,Membership } from './dto/create-membership.input';
+import { CreateMembershipInput, Membership } from './dto/create-membership.input';
 import { UpdateMembershipInput } from './dto/update-membership.input';
+import { ResponseService } from '../../common/utils/response';
 
 @Resolver(() => Membership)
 export class MembershipsResolver {
-  constructor(@Inject('CORE_SERVICE') private readonly coreClient: ClientProxy) {}
+  constructor(
+    @Inject('CORE_SERVICE') private readonly coreClient: ClientProxy,
+    @Inject('RESPONSE') private readonly responseService: ResponseService,
+  ) {}
 
   @Query(() => [Membership])
   async memberships() {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'findAll' }, {}),
+    return this.responseService.sendRequest<Membership[]>(
+      { service: 'memberships', cmd: 'findAll' },
+      {},
+      this.coreClient,
     );
   }
 
   @Query(() => Membership)
   async membership(@Args('id', { type: () => String }) id: string) {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'findOne' }, { id }),
+    return this.responseService.sendRequest<Membership>(
+      { service: 'memberships', cmd: 'findOne' },
+      { id },
+      this.coreClient,
     );
   }
 
   @Query(() => [Membership])
-  async membershipsBySubscription(@Args('subscriptionId', { type: () => String }) subscriptionId: string) {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'findBySubscription' }, { subscriptionId }),
+  async membershipsBySubscription(
+    @Args('subscriptionId', { type: () => String }) subscriptionId: string,
+  ) {
+    return this.responseService.sendRequest<Membership[]>(
+      { service: 'memberships', cmd: 'findBySubscription' },
+      { subscriptionId },
+      this.coreClient,
     );
   }
-
 
   @Query(() => [Membership])
   async membershipsByUser(@Args('userId', { type: () => String }) userId: string) {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'findByUser' }, { userId }),
+    return this.responseService.sendRequest<Membership[]>(
+      { service: 'memberships', cmd: 'findByUser' },
+      { userId },
+      this.coreClient,
     );
   }
 
   @Query(() => Membership)
   async activeMembershipByUser(@Args('userId', { type: () => String }) userId: string) {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'findActiveByUser' }, { userId }),
+    return this.responseService.sendRequest<Membership[]>(
+      { service: 'memberships', cmd: 'findActiveByUser' },
+      { userId },
+      this.coreClient,
     );
   }
 
   @Mutation(() => Membership)
   async createMembership(@Args('input') input: CreateMembershipInput) {
-    // Optionally auto-calc endDate based on subscription duration
     console.log('Creating membership with input:', input);
-    const membership = await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'create' }, input),
+    return this.responseService.sendRequest<Membership>(
+      { service: 'memberships', cmd: 'create' },
+      input,
+      this.coreClient,
     );
-    return membership;
   }
 
   @Mutation(() => Membership)
-  async updateMembership(
-    @Args('input') input: UpdateMembershipInput,
-  ) {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'update' }, input),
+  async updateMembership(@Args('input') input: UpdateMembershipInput) {
+    return this.responseService.sendRequest<Membership>(
+      { service: 'memberships', cmd: 'update' },
+      input,
+      this.coreClient,
     );
   }
 
   @Mutation(() => Boolean)
   async removeMembership(@Args('id', { type: () => String }) id: string) {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'remove' }, { id }),
+    return this.responseService.sendRequest<Membership>(
+      { service: 'memberships', cmd: 'remove' },
+      { id },
+      this.coreClient,
     );
   }
 
   @Query(() => String)
-  async  deactivateExpiredMemberships() {
-    return await lastValueFrom(
-      this.coreClient.send({ service: 'memberships', cmd: 'deactivateExpiredMemberships' }, {}),
+  async deactivateExpiredMemberships() {
+    return this.responseService.sendRequest<Membership>(
+      { service: 'memberships', cmd: 'deactivateExpiredMemberships' },
+      {},
+      this.coreClient,
     );
-  } 
+  }
 }

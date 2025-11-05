@@ -1,8 +1,9 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Version, VersioningType } from '@nestjs/common';
-import { ApiVersion } from 'apps/gateway/src/core/common/constants/app';
-import { JwtGuard } from './core/common/guards/jwt.guard';
+import { ApiVersion } from 'apps/gateway/src/common/constants/app';
+import { JwtGuard } from './common/guards/jwt.guard';
+import { GraphQLExceptionFilter } from './common/exception.filters/graphql.exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,9 +19,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(
   new ValidationPipe({
-    transform: true, // 👈 ensures plain strings become proper Date objects
+    transform: true, 
   }),
 );
+
+  app.useGlobalFilters(new GraphQLExceptionFilter());
 
   app.useGlobalGuards(new JwtGuard(app.get(Reflector)));
 

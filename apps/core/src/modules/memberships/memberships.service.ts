@@ -5,6 +5,7 @@ import { Memberships } from './entities/memberships.entities';
 import { eq,and,lte } from 'drizzle-orm';
 import { DrizzleService } from '@app/lib/core/drizzle';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Subscriptions } from '../subscriptions/entities/subscriptions';
 
 @Injectable()
 export class MembershipsService {
@@ -12,17 +13,33 @@ private readonly logger = new Logger(MembershipsService.name);
 
 constructor(private readonly drizzleService: DrizzleService) {}
   async create(createMembershipDto: CreateMembershipDto) {
-    console.log('Creating membership with DTO:', createMembershipDto);
+  const subscription = await this.drizzleService.db
+    .select()
+    .from(Subscriptions)
+    .where(eq(Subscriptions.id, createMembershipDto.subscriptionId));
+
+  if (!subscription.length) {
+    throw new NotFoundException('Subscription not found');
+    }
+
+    const now = new Date();
+
+    const endDate = new Date(now);
+    endDate.setDate(endDate.getDate() + subscription[0].durationDays);
+
     const membership = await this.drizzleService.db
       .insert(Memberships)
-      .values({...createMembershipDto,
-        startDate: new Date(createMembershipDto.startDate ?? ''),
-        endDate: new Date(createMembershipDto.endDate ?? ''),
+      .values({
+        ...createMembershipDto,
+        startDate: now,
+        endDate, // use computed endDate
       })
       .returning();
-      console.log('Created membership:', membership);
+
+    console.log('Created membership:', membership);
     return membership[0];
   }
+
 
   async findAll() {
     return await this.drizzleService.db.select().from(Memberships);
@@ -66,8 +83,6 @@ constructor(private readonly drizzleService: DrizzleService) {}
     const updated = await this.drizzleService.db
       .update(Memberships)
       .set({...updateMembershipDto,
-        startDate: new Date(updateMembershipDto.startDate ?? ''),
-        endDate: new Date(updateMembershipDto.endDate ?? ''),
       })
       .where(eq(Memberships.id, id))
       .returning();
