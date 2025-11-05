@@ -27,9 +27,12 @@ import { MicroserviceClientsModule } from './microservice.clients.config/microse
     }),
     CoreModule,
     PaymentModule,
-    MicroserviceClientsModule
+    MicroserviceClientsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+  AppService
+],
+
 })
 export class AppModule{}

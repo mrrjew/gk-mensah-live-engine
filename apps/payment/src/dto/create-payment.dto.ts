@@ -4,7 +4,6 @@ export class CreatePaymentDto {
     email: string
     membershipId: string;
     userId: string;
-    paymentDate: Date;
-    callback_url: string;
+    callbackUrl: string;
     reference?: string;
 }

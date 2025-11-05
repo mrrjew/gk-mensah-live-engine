@@ -51,8 +51,7 @@ export class PaymentController {
         userId,
         membershipId,
         method,
-        paymentDate,
-        callback_url,
+        callbackUrl,
       } = createPaymentDto;
 
       const membership = await this.drizzleService.db
@@ -73,13 +72,14 @@ export class PaymentController {
         throw new BadRequestException('Subscription not found');
       }
 
+
       const payment = await this.drizzleService.db
         .insert(Payments)
         .values({
           email,
           userId,
           membershipId,
-          paymentDate: new Date(paymentDate),
+          paymentDate: new Date(),
           amount: String(subscription[0].price),
           status: 'PENDING',
           method,
@@ -96,7 +96,7 @@ export class PaymentController {
           membershipId,
           paymentId: payment[0].id,
         },
-        callback_url,
+        callback_url:callbackUrl,
         currency: 'GHS',
         channels: [method],
       };

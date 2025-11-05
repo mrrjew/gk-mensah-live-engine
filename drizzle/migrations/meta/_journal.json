@@ -15,6 +15,13 @@
       "when": 1762133748686,
       "tag": "0001_conscious_skreet",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762366589715,
+      "tag": "0002_parched_magik",
+      "breakpoints": true
     }
   ]
 }
