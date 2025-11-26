@@ -1,5 +1,6 @@
 import { DrizzleService} from '@app/lib/core/drizzle';
 import { Injectable,HttpException, HttpServer,BadRequestException } from '@nestjs/common';
+import { UserRole } from '../../modules/users/entities/user.base';
 import { Users } from '../../modules/users/entities';
 import { eq,or, SQL } from 'drizzle-orm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,6 +29,15 @@ export class AuthenticationService {
     async createUser(payload:CreateUserDto) {
         try {
             console.log('Creating user with payload:', payload.password);
+            const conditions = [
+                eq(Users.email,payload.email),
+                eq(Users.username,payload.username),
+            ];
+            
+            if (payload.phoneNumber) {
+                conditions.push(eq(Users.phoneNumber,payload.phoneNumber));
+            }
+
             const existingUsers = await this.drizzleService.db
             .select({
                 email: Users.email,
@@ -35,11 +45,7 @@ export class AuthenticationService {
                 phoneNumber: Users.phoneNumber,
             })
             .from(Users)
-                .where(or(
-                    eq(Users.email,payload.email),
-                    eq(Users.username,payload.username),
-                    eq(Users.phoneNumber,payload.phoneNumber)
-                ));
+                .where(or(...conditions));
 
             
             if (existingUsers.length > 0) {
@@ -63,9 +69,24 @@ export class AuthenticationService {
                 throw new BadRequestException('Username, email, and password are required');
             }
             
-            // Hash the password
+            // Hash passwords
             payload.password = await this.hashService.hashPassword(payload.password);
-            const _payload = {...payload,password:payload.password,createdAt:new Date(),updatedAt:new Date()};
+            if(payload.role == "Admin"){
+                payload.adminKey =  await this.hashService.hashPassword(payload.adminKey)
+            }
+
+            // Validate and type the role
+            const validRoles: UserRole[] = ['SuperAdmin', 'Admin', 'User'];
+            const userRole: UserRole = (validRoles.includes(payload.role as UserRole) ? payload.role : 'User') as UserRole;
+
+            const _payload = {
+                ...payload,
+                password: payload.password,
+                adminKey: payload.adminKey,
+                role: userRole,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
 
             // Create the user
             const user = await this.drizzleService.db.insert(Users).values(_payload).returning();
@@ -149,7 +170,8 @@ export class AuthenticationService {
     const payload = {
         sub: user.id,
         email: user.email,
-        username: user.username
+        username: user.username,
+        role: user.role
     };
     
     return {
@@ -157,6 +179,7 @@ export class AuthenticationService {
         user: {
             id: user.id,
             email: user.email,
+            role: user.role,
             username: user.username
         }
     };

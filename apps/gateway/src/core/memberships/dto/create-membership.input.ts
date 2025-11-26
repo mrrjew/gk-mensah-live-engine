@@ -24,6 +24,14 @@ export class Membership {
   isActive?: boolean;
 }
 
+@ObjectType()
+export class MembershipResponse {
+  @Field()
+  success: boolean;
+  @Field()
+  message: string;
+}
+
 @InputType()
 export class CreateMembershipInput {
   @Field(() => String)

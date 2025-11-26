@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateMembershipInput, Membership } from './dto/create-membership.input';
+import { CreateMembershipInput, Membership, MembershipResponse } from './dto/create-membership.input';
 import { UpdateMembershipInput } from './dto/update-membership.input';
 import { ResponseService } from '../../common/utils/response';
 
@@ -78,7 +78,7 @@ export class MembershipsResolver {
     );
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => MembershipResponse)
   async removeMembership(@Args('id', { type: () => String }) id: string) {
     return this.responseService.sendRequest<Membership>(
       { service: 'memberships', cmd: 'remove' },

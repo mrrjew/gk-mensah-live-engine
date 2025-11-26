@@ -16,7 +16,7 @@ export class PaymentResolver {
   @Mutation(() => PaymentResponse)
   async initializePayment(
     @CurrentUser() user: any,
-    @Args('createPaymentInput') createPaymentInput: CreatePaymentInput,
+    @Args('input') createPaymentInput: CreatePaymentInput,
   ) {
     const payload = {
       ...createPaymentInput,

@@ -19,7 +19,6 @@ import { MessagePattern } from '@nestjs/microservices';
 @Controller('payment')
 @ApiTags('Payment Endpoint')
 export class PaymentController {
-  private reference = uuid.v4();
   private readonly PAYSTACK_BASE_URL = 'https://api.paystack.co';
   private readonly PAYSTACK_SECRET_KEY: string;
 
@@ -53,6 +52,8 @@ export class PaymentController {
         method,
         callbackUrl,
       } = createPaymentDto;
+
+      const reference = `ref_${Date.now()}_${uuid.v4()}`;
 
       const membership = await this.drizzleService.db
         .select()
@@ -91,7 +92,7 @@ export class PaymentController {
       const data = {
         email,
         amount: String(subscription[0].price * 100),
-        reference: this.reference,
+        reference,
         metadata: {
           membershipId,
           paymentId: payment[0].id,
