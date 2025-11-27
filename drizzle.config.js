@@ -7,6 +7,7 @@ export default {
     './apps/core/src/modules/memberships/entities/**/*.ts',
     './apps/core/src/modules/subscriptions/entities/**/*.ts',
     './apps/payment/src/entities/**/*.ts',
+    './apps/gateway/src/zoom/zoom.entities.ts',
   ],
   out: './drizzle/migrations',
   dialect: 'postgresql',

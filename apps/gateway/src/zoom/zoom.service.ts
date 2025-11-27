@@ -120,6 +120,8 @@ export class ZoomService {
         .from(zoomMeetings)
         .orderBy(desc(zoomMeetings.createdAt))
         .limit(1);
+      
+        console.log('Active meeting fetch result:', result);
 
       if (result.length === 0) {
         return null;
