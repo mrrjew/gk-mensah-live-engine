@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   InternalServerErrorException,
+  Head,
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import * as uuid from 'uuid';
@@ -30,6 +31,11 @@ export class PaymentController {
       this.configService.get<string>('PAYSTACK_SECRET_KEY') || '';
   }
 
+  @Head()
+    healthCheck(): string {
+      return 'OK';
+    }
+    
   @MessagePattern('pingPayments')
   async ping() {
     return 'Payment service is active';

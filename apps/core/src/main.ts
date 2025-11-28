@@ -5,28 +5,33 @@ import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/exception.filters/all.exceptions.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(CoreModule, {
+  const app = await NestFactory.create(CoreModule);
+
+  const tcpPort = parseInt(process.env.CORE_PORT || '3003', 10);
+  const httpPort = parseInt(process.env.PORT || '4003', 10);
+
+
+  // Attach microservice (TCP)
+  app.connectMicroservice({
     transport: Transport.TCP,
     options: {
       host: process.env.CORE_HOST || 'localhost',
-      port: parseInt(process.env.CORE_PORT || '3003'),
+      port: tcpPort,
     },
   });
 
   app.useGlobalPipes(
-  new ValidationPipe({
-    transform: true,
+    new ValidationPipe({
+      transform: true,
     }),
   );
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-
-  console.log(`Core microservice is running on port ${process.env.CORE_PORT || 3003}`);
-
-  console.log('📡 Registered message handlers:', app['messageHandlers']);
-
-    app.listen()
+  await app.startAllMicroservices();
+  await app.listen(httpPort);
+  console.log(
+    `Core microservice is running on HTTP port ${httpPort} and TCP port ${tcpPort}`,
+  );
 }
-
 bootstrap();

@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Head } from '@nestjs/common';
 import { CoreService } from './core.service';
 
 @Controller()
@@ -9,4 +9,9 @@ export class CoreController {
   getHello(): string {
     return this.CoreService.getHello();
   }
+
+  @Head()
+    healthCheck(): string {
+      return 'OK';
+    }
 }
