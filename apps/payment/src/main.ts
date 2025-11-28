@@ -4,10 +4,15 @@ import { AllExceptionsFilter } from './common/exception.filters/all.exceptions.f
 
 async function bootstrap() {
   const app = await NestFactory.create(PaymentModule);
+  const express = app.getHttpAdapter().getInstance();
+express.get('/', (req, res) => {
+  res.status(200).send('OK');
+});
 
   const tcpPort = parseInt(process.env.PAYMENT_PORT || '3002', 10);
   const httpPort = parseInt(process.env.PORT || '4002', 10);
 
+  
 
   // Attach microservice (TCP)
   app.connectMicroservice({
