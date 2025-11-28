@@ -6,6 +6,10 @@ import { AllExceptionsFilter } from './common/exception.filters/all.exceptions.f
 
 async function bootstrap() {
   const app = await NestFactory.create(CoreModule);
+  const express = app.getHttpAdapter().getInstance();
+  express.get('/', (req, res) => {
+    res.status(200).send('OK');
+  });
 
   const tcpPort = parseInt(process.env.CORE_PORT || '3003', 10);
   const httpPort = parseInt(process.env.PORT || '4003', 10);

@@ -7,6 +7,10 @@ import { GraphQLExceptionFilter } from './common/exception.filters/graphql.excep
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const express = app.getHttpAdapter().getInstance();
+  express.get('/', (req, res) => {
+    res.status(200).send('OK');
+  });
 
   // Attach microservice (TCP)
   const tcpPort = parseInt(process.env.GATEWAY_PORT || '3001', 10);
@@ -15,7 +19,6 @@ async function bootstrap() {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
-
 
   app.connectMicroservice({
     transport: 'TCP',
