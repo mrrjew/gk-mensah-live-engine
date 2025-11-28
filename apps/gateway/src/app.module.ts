@@ -8,6 +8,7 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { CoreModule } from './core/core.module';
 import { PaymentModule } from './payment/payment.module';
 import { MicroserviceClientsModule } from './microservice.clients.config/microservice-clients.module';
+import { ZoomModule } from './zoom/zoom.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MicroserviceClientsModule } from './microservice.clients.config/microse
     CoreModule,
     PaymentModule,
     MicroserviceClientsModule,
+    ZoomModule,
   ],
   controllers: [AppController],
   providers: [

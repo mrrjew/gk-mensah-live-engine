@@ -1,4 +1,4 @@
-import { Injectable,Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable,Logger, NotFoundException } from '@nestjs/common';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
 import { Memberships } from './entities/memberships.entities';
@@ -26,6 +26,12 @@ constructor(private readonly drizzleService: DrizzleService) {}
 
     const endDate = new Date(now);
     endDate.setDate(endDate.getDate() + subscription[0].durationDays);
+
+    const existingActiveMembership = await this.findActiveByUser(createMembershipDto.userId);
+
+    if(existingActiveMembership){
+      throw new BadRequestException('User already has an active membership');
+    }
 
     const membership = await this.drizzleService.db
       .insert(Memberships)
@@ -64,11 +70,11 @@ constructor(private readonly drizzleService: DrizzleService) {}
   }
 
   async findBySubscription(subscriptionId: string) {
-    const membership = await this.drizzleService.db
+    const memberships = await this.drizzleService.db
       .select()
       .from(Memberships)
       .where(eq(Memberships.subscriptionId, subscriptionId));
-    return membership;
+    return memberships;
   }
 
   async findActiveByUser(userId: string) {
@@ -76,7 +82,8 @@ constructor(private readonly drizzleService: DrizzleService) {}
       .select()
       .from(Memberships)
       .where(and(eq(Memberships.userId, userId),eq(Memberships.isActive, true)))
-    return membership;
+      console.log('Active membership for user:', membership);
+    return membership[0];
   }
 
   async update(id: string, updateMembershipDto: UpdateMembershipDto) {
@@ -96,7 +103,7 @@ constructor(private readonly drizzleService: DrizzleService) {}
       .where(eq(Memberships.id, id))
       .returning();
     if (!deleted.length) throw new NotFoundException('Membership not found');
-    return { message: 'Membership deleted successfully' };
+    return { success:true, message: 'Membership deleted successfully' };
   }
 
   @Cron(CronExpression.EVERY_MINUTE)

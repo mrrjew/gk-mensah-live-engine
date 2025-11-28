@@ -25,6 +25,9 @@ export class User {
   password: string;
 
   @Field()
+  role: string;
+
+  @Field()
   createdAt: Date;
 
   @Field()
@@ -170,7 +173,7 @@ export class User {
 export class PublicUser extends PickType(User, [
   'id',
   'email',
-  'username'] as const) {}
+  'username', 'role'] as const) {}
 
 @ObjectType()
 export class Auth {
@@ -192,6 +195,30 @@ export class CreateUserInput {
   @Field()
   password: string;
 
+  @Field({nullable:true})
+  role: string;
+
   @Field({ nullable: true })
   phoneNumber?: string;
+}
+
+@InputType()
+export class CreateAdminUserInput {
+  @Field()
+  username: string;
+
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
+
+  @Field({ nullable: true })
+  phoneNumber?: string;
+
+  @Field(() => String, { description: 'Admin role: Admin or SuperAdmin', defaultValue: 'Admin' })
+  role: string;
+
+  @Field()
+  adminKey:string
 }
