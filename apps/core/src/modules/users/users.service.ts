@@ -21,7 +21,7 @@ export class UsersService {
       const [user] = await this.drizzleService.db
         .select()
         .from(Users)
-        .where(eq(Users.id, (payload.user.sub)));
+        .where(eq(Users.id, payload.user.sub));
 
       if (!user) throw new RpcException('User not found');
 
@@ -56,11 +56,17 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      await this.drizzleService.db
+      const updated = await this.drizzleService.db
         .update(Users)
         .set(updateUserDto)
-        .where(eq(Users.id, id));
-      return { message: `User ${id} updated successfully` };
+        .where(eq(Users.id, id))
+        .returning();
+
+      if (!updated.length) {
+        throw new RpcException('User not found');
+      }
+
+      return updated[0];
     } catch (error) {
       throw new RpcException('Failed to update user');
     }
@@ -68,8 +74,16 @@ export class UsersService {
 
   async remove(id: string) {
     try {
-      await this.drizzleService.db.delete(Users).where(eq(Users.id, id));
-      return { message: `User ${id} removed successfully` };
+      const deleted = await this.drizzleService.db
+        .delete(Users)
+        .where(eq(Users.id, id))
+        .returning();
+
+      if (!deleted.length) {
+        throw new RpcException('User not found');
+      }
+
+      return deleted[0];
     } catch (error) {
       throw new RpcException('Failed to remove user');
     }

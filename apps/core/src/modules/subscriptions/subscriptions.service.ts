@@ -53,7 +53,10 @@ export class SubscriptionsService {
         .set(dto)
         .where(eq(Subscriptions.id, id));
 
-      return { message: `Subscription ${id} updated successfully` };
+      return {
+        success: true,
+        message: `Subscription ${id} updated successfully`,
+      };
     } catch (error) {
       throw new RpcException('Failed to update subscription');
     }
@@ -64,7 +67,10 @@ export class SubscriptionsService {
       await this.drizzleService.db
         .delete(Subscriptions)
         .where(eq(Subscriptions.id, id));
-      return { message: `Subscription ${id} removed successfully` };
+      return {
+        success: true,
+        message: `Subscription ${id} removed successfully`,
+      };
     } catch (error) {
       throw new RpcException('Failed to remove subscription');
     }

@@ -1,4 +1,13 @@
-import { Args, InputType, Field, Int, ObjectType, Resolver, Mutation, Query } from '@nestjs/graphql';
+import {
+  Args,
+  InputType,
+  Field,
+  Int,
+  ObjectType,
+  Resolver,
+  Mutation,
+  Query,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { ZoomService } from './zoom.service';
 import { AdminGuard } from './admin.guard';
@@ -56,17 +65,17 @@ export class ZoomResolver {
   @Mutation(() => ZoomMeeting, { name: 'createZoomMeeting' })
   async create(@Args('input') input: CreateMeetingInput): Promise<any> {
     try {
-    const payload = {
-      topic: input.topic || 'Live stream',
-      type: input.type ?? 2,
-      start_time: input.start_time,
-      duration: input.duration ?? 60,
-      timezone: input.timezone ?? 'UTC',
-      settings: input.settings ?? { join_before_host: false },
-    };
+      const payload = {
+        topic: input.topic || 'Live stream',
+        type: input.type ?? 2,
+        start_time: input.start_time,
+        duration: input.duration ?? 60,
+        timezone: input.timezone ?? 'UTC',
+        settings: input.settings ?? { join_before_host: false },
+      };
 
-    const res = await this.zoomService.createMeeting(payload);
-    return res;
+      const res = await this.zoomService.createMeeting(payload);
+      return res;
     } catch (error) {
       throw new Error(`Failed to create Zoom meeting: ${error.message}`);
     }

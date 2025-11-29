@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@app/lib/core/drizzle';
-import { Payments, UpdatePaymentDto } from './entities'
+import { Payments, UpdatePaymentDto } from './entities';
 import { eq } from 'drizzle-orm';
 import { RpcException } from '@nestjs/microservices';
 
@@ -10,12 +10,14 @@ export class PaymentService {
 
   async create(createPaymentDto: any) {
     try {
-      const result = await this.drizzleService.db.insert(Payments).values(createPaymentDto).returning();
+      const result = await this.drizzleService.db
+        .insert(Payments)
+        .values(createPaymentDto)
+        .returning();
       return result;
-    }
-    catch (error) {
+    } catch (error) {
       throw new RpcException('Failed to create payment');
-    }   
+    }
   }
 
   async findAll() {

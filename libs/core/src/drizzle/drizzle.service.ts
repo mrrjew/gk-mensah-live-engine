@@ -6,14 +6,14 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class DrizzleService implements OnModuleInit, OnModuleDestroy {
-  constructor(private configService:ConfigService) {}
+  constructor(private configService: ConfigService) {}
 
   public db: ReturnType<typeof drizzle>;
   private pool: Pool;
 
   onModuleInit() {
     this.pool = new Pool({
-      connectionString: this.configService.get<string>("DATABASE_URL"),
+      connectionString: this.configService.get<string>('DATABASE_URL'),
       ssl: { rejectUnauthorized: false },
     });
     this.db = drizzle(this.pool, { schema });

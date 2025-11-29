@@ -5,18 +5,23 @@ import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
-  constructor(private readonly jwtService: JwtService,private configService:ConfigService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
   use(req: Request, _res: Response, next: NextFunction) {
     try {
-      const auth = req.headers.authorization as string | undefined;
+      const auth = req.headers.authorization;
       if (!auth?.startsWith('Bearer ')) {
         req['user'] = {};
         return next();
       }
 
       const token = auth.split(' ')[1];
-      const payload = this.jwtService.verify(token,{secret:this.configService.get<string>('JWT_SECRET')});
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_SECRET'),
+      });
       req['user'] = payload;
     } catch (err) {
       console.error('❌ JWT verification failed:', err.message);

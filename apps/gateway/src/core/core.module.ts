@@ -11,15 +11,22 @@ import { ResponseService } from '../common/utils/response';
 @Global()
 @Module({
   imports: [AuthenticationModule],
-  providers: [AuthenticationResolver,UsersResolver,MembershipsResolver,SubscriptionsResolver,JwtMiddleware,JwtService,
-  {
-    provide: 'RESPONSE',
-    useClass: ResponseService,
-  },],
+  providers: [
+    AuthenticationResolver,
+    UsersResolver,
+    MembershipsResolver,
+    SubscriptionsResolver,
+    JwtMiddleware,
+    JwtService,
+    {
+      provide: 'RESPONSE',
+      useClass: ResponseService,
+    },
+  ],
   exports: [AuthenticationModule],
 })
-export class CoreModule implements NestModule{
-  configure(consumer:MiddlewareConsumer) {
+export class CoreModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtMiddleware).forRoutes('*');
   }
 }

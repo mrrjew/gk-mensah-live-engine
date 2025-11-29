@@ -31,6 +31,19 @@
 $ pnpm install
 ```
 
+## Microservice transport
+
+This workspace hosts three NestJS apps (`gateway`, `core`, `payment`). All inter-service traffic now uses **gRPC** instead of raw TCP sockets.
+
+- Shared protobuf contracts live under `proto/` (`core.proto` and `payment.proto`). The files are loaded at runtime, so keep them in sync whenever you add service methods.
+- Each service exposes an HTTP port (for health checks / REST) and a dedicated gRPC listener. Environment variables continue to drive the bindings:
+  - `CORE_HOST` / `CORE_PORT`
+  - `PAYMENT_HOST` / `PAYMENT_PORT`
+  - `GATEWAY_PORT` still controls the optional Nest microservice listener declared in `apps/gateway/src/main.ts`, but the gateway now reaches other services exclusively through its outbound gRPC clients.
+- When deploying to Render (or any platform that offers private networking), point the host variables at the internal service DNS names (for example `gk-live-core-engine:10000`). Local development can stick with `localhost` plus the default ports defined in each `main.ts`.
+
+After updating a proto file, restart the affected Nest service so it rebuilds with the latest schema. No additional code generation step is required because the project relies on Nest's dynamic proto loader.
+
 ## Compile and run the project
 
 ```bash

@@ -14,22 +14,21 @@ import { createId } from '@paralleldrive/cuid2';
 
 // Enum for features
 export const subscriptionFeatureEnum = pgEnum('subscription_feature', [
-  "LIVE_MEETINGS",
-  "REPLAY_ACCESS",
-  "STANDARD_SUPPORT",
-  "PRIORITY_SUPPORT",
-  "EXCLUSIVE_SESSIONS",
-  "PRIVATE_COMMUNITY",
-  "BASIC_SUPPORT",
+  'LIVE_MEETINGS',
+  'REPLAY_ACCESS',
+  'STANDARD_SUPPORT',
+  'PRIORITY_SUPPORT',
+  'EXCLUSIVE_SESSIONS',
+  'PRIVATE_COMMUNITY',
+  'BASIC_SUPPORT',
 ]);
 
 // Main table
 export const Subscriptions = pgTable('subscriptions', {
-    id: 
-        varchar({ length: 255 })
-        .primaryKey()
-        .$defaultFn(() => createId())
-        .notNull(),
+  id: varchar({ length: 255 })
+    .primaryKey()
+    .$defaultFn(() => createId())
+    .notNull(),
   name: varchar('name', { length: 100 }).notNull(),
   description: text('description').notNull(),
   price: integer('price').notNull(),

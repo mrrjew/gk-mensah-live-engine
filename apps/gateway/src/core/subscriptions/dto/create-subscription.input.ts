@@ -1,14 +1,28 @@
-import { InputType, Field, Int, registerEnumType, ObjectType } from '@nestjs/graphql';
-import { IsString, IsNotEmpty, IsInt, IsBoolean, IsOptional, IsArray, IsEnum } from 'class-validator';
+import {
+  InputType,
+  Field,
+  Int,
+  registerEnumType,
+  ObjectType,
+} from '@nestjs/graphql';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsBoolean,
+  IsOptional,
+  IsArray,
+  IsEnum,
+} from 'class-validator';
 
 export enum SubscriptionFeature {
-  LIVE_MEETINGS = "LIVE_MEETINGS",
-  REPLAY_ACCESS = "REPLAY_ACCESS",
-  STANDARD_SUPPORT = "STANDARD_SUPPORT",
-  PRIORITY_SUPPORT = "PRIORITY_SUPPORT",
-  EXCLUSIVE_SESSIONS = "EXCLUSIVE_SESSIONS",
-  PRIVATE_COMMUNITY = "PRIVATE_COMMUNITY",
-  BASIC_SUPPORT = "BASIC_SUPPORT",
+  LIVE_MEETINGS = 'LIVE_MEETINGS',
+  REPLAY_ACCESS = 'REPLAY_ACCESS',
+  STANDARD_SUPPORT = 'STANDARD_SUPPORT',
+  PRIORITY_SUPPORT = 'PRIORITY_SUPPORT',
+  EXCLUSIVE_SESSIONS = 'EXCLUSIVE_SESSIONS',
+  PRIVATE_COMMUNITY = 'PRIVATE_COMMUNITY',
+  BASIC_SUPPORT = 'BASIC_SUPPORT',
 }
 
 // Register enum for GraphQL
@@ -36,10 +50,10 @@ export class Subscription {
   @IsInt()
   price: number;
 
-  @Field({ nullable: true, defaultValue: "GHS" })
+  @Field({ nullable: true, defaultValue: 'GHS' })
   @IsString()
   @IsOptional()
-  currency?: string = "GHS";
+  currency?: string = 'GHS';
 
   @Field(() => Int)
   @IsInt()
@@ -71,10 +85,10 @@ export class CreateSubscriptionInput {
   @IsInt()
   price: number;
 
-  @Field({ nullable: true, defaultValue: "GHS" })
+  @Field({ nullable: true, defaultValue: 'GHS' })
   @IsString()
   @IsOptional()
-  currency?: string = "GHS";
+  currency?: string = 'GHS';
 
   @Field(() => Int)
   @IsInt()

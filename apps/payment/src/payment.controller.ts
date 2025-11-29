@@ -1,6 +1,5 @@
 import {
   Controller,
-  UnauthorizedException,
   BadRequestException,
   InternalServerErrorException,
   Head,
@@ -15,7 +14,7 @@ import { Memberships } from 'apps/core/src/modules/memberships/entities/membersh
 import { eq } from 'drizzle-orm';
 import { Subscriptions } from 'apps/core/src/modules/subscriptions/entities/subscriptions';
 import { Payments } from './entities';
-import { MessagePattern } from '@nestjs/microservices';
+import { GrpcMethod } from '@nestjs/microservices';
 
 @Controller('payment')
 @ApiTags('Payment Endpoint')
@@ -32,16 +31,16 @@ export class PaymentController {
   }
 
   @Head()
-    healthCheck(): string {
-      return 'OK';
-    }
-    
-  @MessagePattern('pingPayments')
-  async ping() {
-    return 'Payment service is active';
+  healthCheck(): string {
+    return 'OK';
   }
 
-  @MessagePattern({ cmd: 'initialize_payment' })
+  @GrpcMethod('PaymentService', 'Ping')
+  async ping() {
+    return { message: 'Payment service is active' };
+  }
+
+  @GrpcMethod('PaymentService', 'InitializePayment')
   @ApiResponse({
     example: {
       authorization_url: 'https://checkout.paystack.com/kmwk9zms4qb4kaj',
@@ -51,13 +50,8 @@ export class PaymentController {
   })
   async initializePayment(createPaymentDto: CreatePaymentDto) {
     try {
-      const {
-        email,
-        userId,
-        membershipId,
-        method,
-        callbackUrl,
-      } = createPaymentDto;
+      const { email, userId, membershipId, method, callbackUrl } =
+        createPaymentDto;
 
       const reference = `ref_${Date.now()}_${uuid.v4()}`;
 
@@ -79,7 +73,6 @@ export class PaymentController {
         throw new BadRequestException('Subscription not found');
       }
 
-
       const payment = await this.drizzleService.db
         .insert(Payments)
         .values({
@@ -93,7 +86,7 @@ export class PaymentController {
         })
         .returning();
 
-        console.log('Created payment record:', payment);  
+      console.log('Created payment record:', payment);
 
       const data = {
         email,
@@ -103,7 +96,7 @@ export class PaymentController {
           membershipId,
           paymentId: payment[0].id,
         },
-        callback_url:callbackUrl,
+        callback_url: callbackUrl,
         currency: 'GHS',
         channels: [method],
       };
@@ -136,9 +129,10 @@ export class PaymentController {
     }
   }
 
-  @MessagePattern({ cmd: 'verify_payment' })
-  async verify(reference: string) {
+  @GrpcMethod('PaymentService', 'VerifyPayment')
+  async verify(payload: { reference: string }) {
     try {
+      const { reference } = payload;
       const response = await axios.get(
         `${this.PAYSTACK_BASE_URL}/transaction/verify/${reference}`,
         {
@@ -187,41 +181,30 @@ export class PaymentController {
     }
   }
 
-
-  @MessagePattern({ cmd: 'get_payments' })
-  async getPayments(id: string) {
-    const payment = await this.drizzleService.db
-      .select()
-      .from(Payments);
-    if (!payment.length) {
-      throw new BadRequestException('No payments found');
-    }
-    return payment;
+  @GrpcMethod('PaymentService', 'GetPayments')
+  async getPayments() {
+    const payment = await this.drizzleService.db.select().from(Payments);
+    return { items: payment };
   }
 
-  @MessagePattern({ cmd: 'get_payment' })
-  async getPayment(id: string) {
+  @GrpcMethod('PaymentService', 'GetPayment')
+  async getPayment(payload: { paymentId: string }) {
     const payment = await this.drizzleService.db
       .select()
       .from(Payments)
-      .where(eq(Payments.id, id));
+      .where(eq(Payments.id, payload.paymentId));
     if (!payment.length) {
       throw new BadRequestException('Payment not found');
     }
     return payment[0];
   }
 
-  @MessagePattern({ cmd: 'get_payments_by_user' })
-  async getPaymentsByUser(userId: string) {
+  @GrpcMethod('PaymentService', 'GetPaymentsByUser')
+  async getPaymentsByUser(payload: { userId: string }) {
     const payments = await this.drizzleService.db
       .select()
       .from(Payments)
-      .where(eq(Payments.userId, userId));
-    if (!payments.length) {
-      throw new BadRequestException('No payments found for this user');
-    }
-    return payments;
+      .where(eq(Payments.userId, payload.userId));
+    return { items: payments };
   }
-
-  
 }

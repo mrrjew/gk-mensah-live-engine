@@ -173,7 +173,9 @@ export class User {
 export class PublicUser extends PickType(User, [
   'id',
   'email',
-  'username', 'role'] as const) {}
+  'username',
+  'role',
+] as const) {}
 
 @ObjectType()
 export class Auth {
@@ -195,7 +197,7 @@ export class CreateUserInput {
   @Field()
   password: string;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   role: string;
 
   @Field({ nullable: true })
@@ -216,9 +218,12 @@ export class CreateAdminUserInput {
   @Field({ nullable: true })
   phoneNumber?: string;
 
-  @Field(() => String, { description: 'Admin role: Admin or SuperAdmin', defaultValue: 'Admin' })
+  @Field(() => String, {
+    description: 'Admin role: Admin or SuperAdmin',
+    defaultValue: 'Admin',
+  })
   role: string;
 
   @Field()
-  adminKey:string
+  adminKey: string;
 }
