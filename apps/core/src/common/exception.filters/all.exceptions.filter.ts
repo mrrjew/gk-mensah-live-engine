@@ -1,4 +1,9 @@
-import { Catch, ArgumentsHost, RpcExceptionFilter, BadRequestException } from '@nestjs/common';
+import {
+  Catch,
+  ArgumentsHost,
+  RpcExceptionFilter,
+  BadRequestException,
+} from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
 import { RpcError } from '@app/lib/core/errors/RPC.errors';

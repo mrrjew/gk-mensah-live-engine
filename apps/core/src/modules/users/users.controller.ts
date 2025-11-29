@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, RpcException } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -9,51 +9,60 @@ export class UsersController {
     console.log('✅ UsersController initialized');
   }
 
-  @MessagePattern('pingMe')
+  @GrpcMethod('UsersService', 'PingMe')
   async pingMe() {
-    return 'Me is fine';
+    return { message: 'Me is fine' };
   }
 
-  @MessagePattern({ service: 'users', cmd: 'me' })
-  async me(data: any) {
+  @GrpcMethod('UsersService', 'Me')
+  async me(payload: { data?: any }) {
     try {
-
-      if (!data?.user || !data?.user?.sub) {
+      if (!payload?.data?.user || !payload?.data?.user?.sub) {
         throw new RpcException('Unauthorized: Missing user info');
       }
 
-      return await this.usersService.me(data);
+      const user = await this.usersService.me(payload.data);
+      return { data: user };
     } catch (err) {
       console.error('❌ Error in core microservice me():', err);
       throw new RpcException(err?.message || 'Internal server error');
     }
   }
 
-  @MessagePattern({ service: 'users', cmd: 'findAll' })
+  @GrpcMethod('UsersService', 'FindAll')
   async findAll() {
-    return this.usersService.findAll();
+    const users = await this.usersService.findAll();
+    return { items: users };
   }
 
-  @MessagePattern({ service: 'users', cmd: 'findOne' })
+  @GrpcMethod('UsersService', 'FindOne')
   async findOne(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
-    return this.usersService.findOne(data.id);
+    const user = await this.usersService.findOne(data.id);
+    return { data: user };
   }
 
-  @MessagePattern({ service: 'users', cmd: 'updateUser' })
-  async update(updateUserDto: UpdateUserDto) {
+  @GrpcMethod('UsersService', 'UpdateUser')
+  async update(payload: { data?: UpdateUserDto }) {
+    const updateUserDto = payload?.data;
     if (!updateUserDto?.id) throw new RpcException('Missing user ID');
-    return this.usersService.update(updateUserDto.id, updateUserDto);
+    const message = await this.usersService.update(
+      updateUserDto.id,
+      updateUserDto,
+    );
+    return { data: message };
   }
 
-  @MessagePattern({ service: 'users', cmd: 'removeUser' })
+  @GrpcMethod('UsersService', 'RemoveUser')
   async remove(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
-    return this.usersService.remove(data.id);
+    const message = await this.usersService.remove(data.id);
+    return { data: message };
   }
 
-  @MessagePattern({ service: 'users', cmd: 'removeAllUsers' })
+  @GrpcMethod('UsersService', 'RemoveAllUsers')
   async removeAllUsers() {
-    return this.usersService.removeAllUsers();
+    const message = await this.usersService.removeAllUsers();
+    return { data: message };
   }
 }

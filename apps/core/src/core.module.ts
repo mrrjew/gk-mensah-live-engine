@@ -9,10 +9,15 @@ import { MembershipsModule } from './modules/memberships/memberships.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [ScheduleModule.forRoot(),AuthenticationModule,DrizzleModule, UsersModule,SubscriptionsModule,MembershipsModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    AuthenticationModule,
+    DrizzleModule,
+    UsersModule,
+    SubscriptionsModule,
+    MembershipsModule,
+  ],
   controllers: [CoreController],
   providers: [CoreService],
 })
-export class CoreModule {
-
-}
+export class CoreModule {}

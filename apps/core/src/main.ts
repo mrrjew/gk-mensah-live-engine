@@ -3,6 +3,7 @@ import { CoreModule } from './core.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/exception.filters/all.exceptions.filter';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(CoreModule);
@@ -11,18 +12,21 @@ async function bootstrap() {
     res.status(200).send('OK');
   });
 
-  const tcpPort = parseInt(process.env.CORE_PORT || '3003', 10);
+  const grpcPort = parseInt(process.env.CORE_PORT || '3003', 10);
   const httpPort = parseInt(process.env.PORT || '4003', 10);
 
+  const grpcHost = process.env.CORE_HOST || '0.0.0.0';
 
-  // Attach microservice (TCP)
-  app.connectMicroservice({
-    transport: Transport.TCP,
+  const grpcOptions: MicroserviceOptions = {
+    transport: Transport.GRPC,
     options: {
-      host: process.env.CORE_HOST || 'localhost',
-      port: tcpPort,
+      package: 'core',
+      protoPath: [join(process.cwd(), 'proto/core.proto')],
+      url: `${grpcHost}:${grpcPort}`,
     },
-  });
+  };
+
+  app.connectMicroservice<MicroserviceOptions>(grpcOptions);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -35,7 +39,7 @@ async function bootstrap() {
   await app.startAllMicroservices();
   await app.listen(httpPort);
   console.log(
-    `Core microservice is running on HTTP port ${httpPort} and TCP port ${tcpPort}`,
+    `Core microservice is running on HTTP port ${httpPort} with gRPC endpoint ${grpcHost}:${grpcPort}`,
   );
 }
 bootstrap();

@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, RpcException } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
@@ -10,12 +10,12 @@ export class SubscriptionsController {
     console.log('✅ SubscriptionsController initialized');
   }
 
-  @MessagePattern('pingSubscriptions')
+  @GrpcMethod('SubscriptionsService', 'Ping')
   async pingSubscriptions() {
-    return 'Subscriptions service is live 🚀';
+    return { message: 'Subscriptions service is live 🚀' };
   }
 
-  @MessagePattern({ service: 'subscriptions', cmd: 'create' })
+  @GrpcMethod('SubscriptionsService', 'Create')
   async create(data: CreateSubscriptionDto) {
     try {
       if (!data?.name) throw new RpcException('Missing subscription name');
@@ -26,26 +26,29 @@ export class SubscriptionsController {
     }
   }
 
-  @MessagePattern({ service: 'subscriptions', cmd: 'findAll' })
+  @GrpcMethod('SubscriptionsService', 'FindAll')
   async findAll() {
-    return this.subscriptionsService.findAll();
+    const subscriptions = await this.subscriptionsService.findAll();
+    return { items: subscriptions };
   }
 
-  @MessagePattern({ service: 'subscriptions', cmd: 'findOne' })
+  @GrpcMethod('SubscriptionsService', 'FindOne')
   async findOne(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
     return this.subscriptionsService.findOne(data.id);
   }
 
-  @MessagePattern({ service: 'subscriptions', cmd: 'update' })
+  @GrpcMethod('SubscriptionsService', 'Update')
   async update(data: UpdateSubscriptionDto) {
     if (!data?.id) throw new RpcException('Missing subscription ID');
-    return this.subscriptionsService.update(data.id, data);
+    const message = await this.subscriptionsService.update(data.id, data);
+    return { success: true, message: message.message };
   }
 
-  @MessagePattern({ service: 'subscriptions', cmd: 'remove' })
+  @GrpcMethod('SubscriptionsService', 'Remove')
   async remove(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
-    return this.subscriptionsService.remove(data.id);
+    const message = await this.subscriptionsService.remove(data.id);
+    return { success: true, message: message.message };
   }
 }

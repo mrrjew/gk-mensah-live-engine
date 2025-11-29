@@ -9,12 +9,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports:[DrizzleModule,HashModule,JwtModule.register({
+  imports: [
+    DrizzleModule,
+    HashModule,
+    JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultsecret',
       signOptions: { expiresIn: '1d' },
-    }),PassportModule.register({ defaultStrategy: 'local' }),
-],
+    }),
+    PassportModule.register({ defaultStrategy: 'local' }),
+  ],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService,DrizzleService,HashService],
+  providers: [AuthenticationService, DrizzleService, HashService],
 })
 export class AuthenticationModule {}

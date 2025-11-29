@@ -1,61 +1,78 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { Inject, UseGuards } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
-import { Auth, CreateUserInput, CreateAdminUserInput, User } from './dto/create-user.dto';
+import { Inject, OnModuleInit, UseGuards } from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
+import {
+  Auth,
+  CreateUserInput,
+  CreateAdminUserInput,
+} from './dto/create-user.dto';
 import { LoginInput } from './dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { ResponseService } from '../../common/utils/response';
 import { SuperAdminGuard } from '../../common/guards/superAdmin.guard';
+import {
+  AuthenticationGrpcService,
+  Empty,
+  PingReply,
+} from '../../grpc/core-grpc.types';
 
 @Resolver(() => Auth)
-export class AuthenticationResolver {
+export class AuthenticationResolver implements OnModuleInit {
+  private authenticationService: AuthenticationGrpcService;
+
   constructor(
-    @Inject('CORE_SERVICE') private readonly coreService: ClientProxy,
+    @Inject('CORE_SERVICE') private readonly coreService: ClientGrpc,
     @Inject('RESPONSE') private readonly responseService: ResponseService,
   ) {}
+
+  onModuleInit() {
+    this.authenticationService =
+      this.coreService.getService<AuthenticationGrpcService>(
+        'AuthenticationService',
+      );
+  }
 
   @Query(() => String, { name: 'ping' })
   @Public()
   async ping() {
-    return lastValueFrom(this.coreService.send<String>('pingAuthentication', ''));
+    const response = await this.responseService.sendRequest<PingReply>(
+      this.authenticationService.ping({} as Empty),
+    );
+    return response.message;
   }
 
   @Query(() => String, { name: 'pingDB' })
   @Public()
   async pingDatabase() {
-    return lastValueFrom(
-      this.coreService.send<String>('pingAuthenticationDatabase', ''),
+    const response = await this.responseService.sendRequest<PingReply>(
+      this.authenticationService.pingDatabase({} as Empty),
     );
+    return response.message;
   }
 
   @Mutation(() => Auth, { name: 'createUser' })
   @Public()
   async createUser(@Args('input') input: CreateUserInput) {
     return this.responseService.sendRequest<Auth>(
-      { service: 'authentication', cmd: 'createUser' },
-      input,
-      this.coreService,
+      this.authenticationService.createUser(input),
     );
   }
 
   @Mutation(() => Auth, { name: 'loginUser' })
   @Public()
   async loginUser(@Args('input') input: LoginInput) {
-    return this.responseService.sendRequest<Auth>(
-      { service: 'authentication', cmd: 'loginUser' },
-      input,
-      this.coreService,
+    const res = await this.responseService.sendRequest<Auth>(
+      this.authenticationService.loginUser(input),
     );
+    console.log(res)
+    return res;
   }
 
   @Mutation(() => Auth, { name: 'createAdminUser' })
   @UseGuards(SuperAdminGuard)
   async createAdminUser(@Args('input') input: CreateAdminUserInput) {
     return this.responseService.sendRequest<Auth>(
-      { service: 'authentication', cmd: 'createUser' },
-      input,
-      this.coreService,
+      this.authenticationService.createAdminUser(input),
     );
   }
 }

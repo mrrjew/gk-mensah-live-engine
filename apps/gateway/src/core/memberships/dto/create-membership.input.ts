@@ -1,4 +1,10 @@
-import { Field, InputType, Int, ObjectType, GraphQLISODateTime } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  GraphQLISODateTime,
+} from '@nestjs/graphql';
 
 @ObjectType()
 export class Membership {
@@ -12,7 +18,7 @@ export class Membership {
   subscriptionId: string;
 
   @Field()
-  startDate:string
+  startDate: string;
 
   @Field()
   endDate: string;
@@ -35,7 +41,7 @@ export class MembershipResponse {
 @InputType()
 export class CreateMembershipInput {
   @Field(() => String)
-  userId: string;
+  userId: string | undefined;
 
   @Field(() => String)
   subscriptionId: string;

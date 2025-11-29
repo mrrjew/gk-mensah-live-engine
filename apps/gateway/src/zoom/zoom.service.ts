@@ -23,7 +23,9 @@ export class ZoomService {
     const userId = process.env.ZOOM_USER_ID || 'me';
 
     if (!clientId || !clientSecret) {
-      throw new Error('ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET must be set in env');
+      throw new Error(
+        'ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET must be set in env',
+      );
     }
 
     return { clientId, clientSecret, accountId, userId };
@@ -31,43 +33,49 @@ export class ZoomService {
 
   private async fetchAccessToken() {
     try {
-    const { clientId, clientSecret, accountId } = this.getClientCredentials();
+      const { clientId, clientSecret, accountId } = this.getClientCredentials();
 
+      const basic = Buffer.from(`${clientId}:${clientSecret}`).toString(
+        'base64',
+      );
+      const url = `https://zoom.us/oauth/token?grant_type=account_credentials${accountId ? `&account_id=${accountId}` : ''}`;
 
-    const basic = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    const url = `https://zoom.us/oauth/token?grant_type=account_credentials${accountId ? `&account_id=${accountId}` : ''}`;
+      this.logger.debug('Requesting Zoom access token');
 
-    this.logger.debug('Requesting Zoom access token');
+      const resp = await axios
+        .post(
+          url,
+          {},
+          {
+            headers: {
+              Authorization: `Basic ${basic}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          },
+        )
+        .catch((error) => {
+          this.logger.error(
+            'Error response from Zoom token endpoint:',
+            error.response?.data || error.message,
+          );
+          throw error;
+        });
 
-    const resp = await axios.post(
-      url,
-      {},
-      {
-        headers: {
-          Authorization: `Basic ${basic}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      },
-    ).catch((error) => {
-      this.logger.error('Error response from Zoom token endpoint:', error.response?.data || error.message);
-      throw error;
-    });
-    
-    const data = resp.data as { access_token: string; expires_in: number };
-    if (!data || !data.access_token) {
+      const data = resp.data as { access_token: string; expires_in: number };
+      if (!data || !data.access_token) {
         throw new Error('Failed to obtain Zoom access token');
-    }
-    
-    const now = Date.now();
-    this.tokenCache = {
+      }
+
+      const now = Date.now();
+      this.tokenCache = {
         accessToken: data.access_token,
         expiresAt: now + (data.expires_in - 30) * 1000,
-    };
-    
-    return this.tokenCache.accessToken;
+      };
+
+      return this.tokenCache.accessToken;
     } catch (error) {
-    this.logger.error('Error fetching Zoom access token:', error);
-    throw error;
+      this.logger.error('Error fetching Zoom access token:', error);
+      throw error;
     }
   }
 
@@ -120,8 +128,8 @@ export class ZoomService {
         .from(zoomMeetings)
         .orderBy(desc(zoomMeetings.createdAt))
         .limit(1);
-      
-        console.log('Active meeting fetch result:', result);
+
+      console.log('Active meeting fetch result:', result);
 
       if (result.length === 0) {
         return null;

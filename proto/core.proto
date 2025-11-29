@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+package core;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+
+message PingReply {
+  string message = 1;
+}
+
+message AuthRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string role = 4;
+  string phoneNumber = 5;
+  string adminKey = 6;
+}
+
+message LoginRequest {
+  string email = 1;
+  string username = 2;
+  string phoneNumber = 3;
+  string password = 4;
+}
+
+message AuthResponse {
+  string accessToken = 1;
+  google.protobuf.Struct user = 2;
+}
+
+message ThirdPartyRequest {
+  string username = 1;
+  string email = 2;
+  string phoneNumber = 3;
+}
+
+message StructPayload {
+  google.protobuf.Struct data = 1;
+}
+
+message StructList {
+  repeated google.protobuf.Struct items = 1;
+}
+
+message IdRequest {
+  string id = 1;
+}
+
+message Membership {
+  string id = 1;
+  string userId = 2;
+  string subscriptionId = 3;
+  string startDate = 4;
+  string endDate = 5;
+  string paymentReference = 6;
+  bool isActive = 7;
+}
+
+message MembershipList {
+  repeated Membership items = 1;
+}
+
+message MembershipCreateRequest {
+  string userId = 1;
+  string subscriptionId = 2;
+  string paymentReference = 3;
+  bool isActive = 4;
+}
+
+message MembershipUpdateRequest {
+  string id = 1;
+  string userId = 2;
+  string subscriptionId = 3;
+  string paymentReference = 4;
+  bool isActive = 5;
+}
+
+message MembershipByUserRequest {
+  string userId = 1;
+}
+
+message MembershipBySubscriptionRequest {
+  string subscriptionId = 1;
+}
+
+message GenericResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message Subscription {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string currency = 5;
+  int32 durationDays = 6;
+  repeated string features = 7;
+  bool mostPopular = 8;
+}
+
+message SubscriptionList {
+  repeated Subscription items = 1;
+}
+
+message SubscriptionCreateRequest {
+  string name = 1;
+  string description = 2;
+  int32 price = 3;
+  string currency = 4;
+  int32 durationDays = 5;
+  repeated string features = 6;
+  bool mostPopular = 7;
+}
+
+message SubscriptionUpdateRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string currency = 5;
+  int32 durationDays = 6;
+  repeated string features = 7;
+  bool mostPopular = 8;
+}
+
+service AuthenticationService {
+  rpc Ping(google.protobuf.Empty) returns (PingReply);
+  rpc PingDatabase(google.protobuf.Empty) returns (PingReply);
+  rpc CreateUser(AuthRequest) returns (AuthResponse);
+  rpc CreateAdminUser(AuthRequest) returns (AuthResponse);
+  rpc LoginUser(LoginRequest) returns (AuthResponse);
+  rpc ValidateThirdParty(ThirdPartyRequest) returns (AuthResponse);
+}
+
+service UsersService {
+  rpc PingMe(google.protobuf.Empty) returns (PingReply);
+  rpc Me(StructPayload) returns (StructPayload);
+  rpc FindAll(google.protobuf.Empty) returns (StructList);
+  rpc FindOne(IdRequest) returns (StructPayload);
+  rpc UpdateUser(StructPayload) returns (StructPayload);
+  rpc RemoveUser(IdRequest) returns (StructPayload);
+  rpc RemoveAllUsers(google.protobuf.Empty) returns (StructPayload);
+}
+
+service MembershipsService {
+  rpc Ping(google.protobuf.Empty) returns (PingReply);
+  rpc Create(MembershipCreateRequest) returns (Membership);
+  rpc FindAll(google.protobuf.Empty) returns (MembershipList);
+  rpc FindOne(IdRequest) returns (Membership);
+  rpc FindByUser(MembershipByUserRequest) returns (MembershipList);
+  rpc FindBySubscription(MembershipBySubscriptionRequest) returns (MembershipList);
+  rpc FindActiveByUser(MembershipByUserRequest) returns (Membership);
+  rpc Update(MembershipUpdateRequest) returns (Membership);
+  rpc Remove(IdRequest) returns (GenericResponse);
+  rpc DeactivateExpired(google.protobuf.Empty) returns (GenericResponse);
+}
+
+service SubscriptionsService {
+  rpc Ping(google.protobuf.Empty) returns (PingReply);
+  rpc Create(SubscriptionCreateRequest) returns (Subscription);
+  rpc FindAll(google.protobuf.Empty) returns (SubscriptionList);
+  rpc FindOne(IdRequest) returns (Subscription);
+  rpc Update(SubscriptionUpdateRequest) returns (GenericResponse);
+  rpc Remove(IdRequest) returns (GenericResponse);
+}

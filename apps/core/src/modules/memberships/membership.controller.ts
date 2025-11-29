@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, RpcException } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { MembershipsService } from './memberships.service';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
@@ -10,12 +10,12 @@ export class MembershipsController {
     console.log(' MembershipsController initialized');
   }
 
-  @MessagePattern('pingMemberships')
+  @GrpcMethod('MembershipsService', 'Ping')
   async ping() {
-    return 'Memberships service is active ';
+    return { message: 'Memberships service is active' };
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'create' })
+  @GrpcMethod('MembershipsService', 'Create')
   async create(createMembershipDto: CreateMembershipDto) {
     try {
       console.log('Received createMembershipDto:', createMembershipDto);
@@ -26,17 +26,18 @@ export class MembershipsController {
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'findAll' })
+  @GrpcMethod('MembershipsService', 'FindAll')
   async findAll() {
     try {
-      return await this.membershipsService.findAll();
+      const memberships = await this.membershipsService.findAll();
+      return { items: memberships };
     } catch (err) {
       console.error('Error fetching memberships:', err);
       throw new RpcException('Failed to fetch memberships');
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'findOne' })
+  @GrpcMethod('MembershipsService', 'FindOne')
   async findOne(data: { id: string }) {
     try {
       if (!data?.id) throw new RpcException('Missing membership ID');
@@ -47,51 +48,72 @@ export class MembershipsController {
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'findByUser' })
+  @GrpcMethod('MembershipsService', 'FindByUser')
   async findByUser(data: { userId: string }) {
     try {
       if (!data?.userId) throw new RpcException('Missing user ID');
-      return await this.membershipsService.findByUser(data.userId);
+      const memberships = await this.membershipsService.findByUser(data.userId);
+      return { items: memberships };
     } catch (err) {
       console.error('Error finding user memberships:', err);
-      throw new RpcException(err?.message || 'Failed to fetch user memberships');
+      throw new RpcException(
+        err?.message || 'Failed to fetch user memberships',
+      );
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'findBySubscription' })
+  @GrpcMethod('MembershipsService', 'FindBySubscription')
   async findBySubscription(data: { subscriptionId: string }) {
     try {
-      if (!data?.subscriptionId) throw new RpcException('Missing subscription ID');
-      return await this.membershipsService.findBySubscription(data.subscriptionId);
+      if (!data?.subscriptionId)
+        throw new RpcException('Missing subscription ID');
+      const memberships = await this.membershipsService.findBySubscription(
+        data.subscriptionId,
+      );
+      return { items: memberships };
     } catch (err) {
       console.error('Error finding subscription memberships:', err);
-      throw new RpcException(err?.message || 'Failed to fetch subscription memberships');
+      throw new RpcException(
+        err?.message || 'Failed to fetch subscription memberships',
+      );
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'findActiveByUser' })
+  @GrpcMethod('MembershipsService', 'FindActiveByUser')
   async findActiveByUser(data: { userId: string }) {
     try {
       if (!data?.userId) throw new RpcException('Missing user ID');
-      return await this.membershipsService.findActiveByUser(data.userId);
+      const membership = await this.membershipsService.findActiveByUser(
+        data.userId,
+      );
+      if (!membership) {
+        throw new RpcException('Active membership not found');
+      }
+      return membership;
     } catch (err) {
       console.error('Error finding active user memberships:', err);
-      throw new RpcException(err?.message || 'Failed to fetch active user memberships');
+      throw new RpcException(
+        err?.message || 'Failed to fetch active user memberships',
+      );
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'update' })
+  @GrpcMethod('MembershipsService', 'Update')
   async update(updateMembershipDto: UpdateMembershipDto & { id: string }) {
     try {
-      if (!updateMembershipDto?.id) throw new RpcException('Missing membership ID');
-      return await this.membershipsService.update(updateMembershipDto.id, updateMembershipDto);
+      if (!updateMembershipDto?.id)
+        throw new RpcException('Missing membership ID');
+      return await this.membershipsService.update(
+        updateMembershipDto.id,
+        updateMembershipDto,
+      );
     } catch (err) {
       console.error('Error updating membership:', err);
       throw new RpcException(err?.message || 'Failed to update membership');
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'remove' })
+  @GrpcMethod('MembershipsService', 'Remove')
   async remove(data: { id: string }) {
     try {
       if (!data?.id) throw new RpcException('Missing membership ID');
@@ -102,7 +124,7 @@ export class MembershipsController {
     }
   }
 
-  @MessagePattern({ service: 'memberships', cmd: 'deactivateExpired' })
+  @GrpcMethod('MembershipsService', 'DeactivateExpired')
   async deactivateExpired() {
     try {
       return await this.membershipsService.deactivateExpiredMemberships();

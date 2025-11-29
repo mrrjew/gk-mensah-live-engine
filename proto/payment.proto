@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package payment;
+
+import "google/protobuf/empty.proto";
+
+message PaymentMessage {
+  string message = 1;
+}
+
+message PaymentInitRequest {
+  string email = 1;
+  string userId = 2;
+  string membershipId = 3;
+  string method = 4;
+  string callbackUrl = 5;
+  string reference = 6;
+}
+
+message PaymentInitResponse {
+  string authorization_url = 1;
+  string access_code = 2;
+  string reference = 3;
+}
+
+message VerifyRequest {
+  string reference = 1;
+}
+
+message VerifyResponse {
+  string message = 1;
+}
+
+message PaymentIdRequest {
+  string paymentId = 1;
+}
+
+message UserPaymentsRequest {
+  string userId = 1;
+}
+
+message Payment {
+  string id = 1;
+  string userId = 2;
+  string email = 3;
+  string membershipId = 4;
+  string amount = 5;
+  string method = 6;
+  string status = 7;
+  string reference = 8;
+  string callbackUrl = 9;
+  string paymentDate = 10;
+}
+
+message PaymentsList {
+  repeated Payment items = 1;
+}
+
+service PaymentService {
+  rpc Ping(google.protobuf.Empty) returns (PaymentMessage);
+  rpc InitializePayment(PaymentInitRequest) returns (PaymentInitResponse);
+  rpc VerifyPayment(VerifyRequest) returns (VerifyResponse);
+  rpc GetPayment(PaymentIdRequest) returns (Payment);
+  rpc GetPayments(google.protobuf.Empty) returns (PaymentsList);
+  rpc GetPaymentsByUser(UserPaymentsRequest) returns (PaymentsList);
+}

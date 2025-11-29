@@ -3,10 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthenticationResolver } from './authentication.resolver';
 
 @Module({
-  imports: [
-    ConfigModule,
-  ],
+  imports: [ConfigModule],
   providers: [AuthenticationResolver],
-  exports:[AuthenticationResolver]
+  exports: [AuthenticationResolver],
 })
 export class AuthenticationModule {}

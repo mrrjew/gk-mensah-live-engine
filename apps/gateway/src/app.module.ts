@@ -32,9 +32,6 @@ import { ZoomModule } from './zoom/zoom.module';
     ZoomModule,
   ],
   controllers: [AppController],
-  providers: [
-  AppService
-],
-
+  providers: [AppService],
 })
-export class AppModule{}
+export class AppModule {}

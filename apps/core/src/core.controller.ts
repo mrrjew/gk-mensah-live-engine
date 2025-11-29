@@ -11,7 +11,7 @@ export class CoreController {
   }
 
   @Head()
-    healthCheck(): string {
-      return 'OK';
-    }
+  healthCheck(): string {
+    return 'OK';
+  }
 }
