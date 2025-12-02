@@ -24,7 +24,8 @@ async function bootstrap() {
     },
   };
 
-  app.connectMicroservice<MicroserviceOptions>(grpcOptions);
+  app.connectMicroservice<MicroserviceOptions>(grpcOptions,
+  { inheritAppConfig: true });
 
   app.useGlobalFilters(new AllExceptionsFilter());
 

@@ -24,7 +24,14 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   accessToken: string;
-  user: Record<string, any>;
+  user: PublicUser;
+}
+
+export interface PublicUser {
+  id: string;
+  email: string;
+  username: string;
+  role: string;
 }
 
 export interface ThirdPartyRequest {

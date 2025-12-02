@@ -27,7 +27,14 @@ message LoginRequest {
 
 message AuthResponse {
   string accessToken = 1;
-  google.protobuf.Struct user = 2;
+  PublicUser user = 2;
+}
+
+message PublicUser {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string role = 4;
 }
 
 message ThirdPartyRequest {

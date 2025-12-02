@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+yarn-error.log
+dist
+tmp
+.DS_Store
+.git
+.gitignore
+render.yaml
+.vscode
+coverage
+.drizzle
+.env
+.env.*

@@ -17,6 +17,14 @@ async function bootstrap() {
 
   const grpcHost = process.env.CORE_HOST || '0.0.0.0';
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
+
+  app.useGlobalFilters(new AllExceptionsFilter());
+
   const grpcOptions: MicroserviceOptions = {
     transport: Transport.GRPC,
     options: {
@@ -26,15 +34,9 @@ async function bootstrap() {
     },
   };
 
-  app.connectMicroservice<MicroserviceOptions>(grpcOptions);
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-    }),
-  );
-
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.connectMicroservice<MicroserviceOptions>(grpcOptions, {
+    inheritAppConfig: true,
+  });
 
   await app.startAllMicroservices();
   await app.listen(httpPort);
