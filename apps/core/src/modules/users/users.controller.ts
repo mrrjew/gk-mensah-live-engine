@@ -15,14 +15,14 @@ export class UsersController {
   }
 
   @GrpcMethod('UsersService', 'Me')
-  async me(payload: { data?: any }) {
+  async me(payload: { userId?: string }) {
     try {
-      if (!payload?.data?.user || !payload?.data?.user?.sub) {
+      console.log('🔍 Received me() request with payload:', payload);
+      if (!payload?.userId) {
         throw new RpcException('Unauthorized: Missing user info');
       }
 
-      const user = await this.usersService.me(payload.data);
-      return { data: user };
+      return await this.usersService.me(payload.userId);
     } catch (err) {
       console.error('❌ Error in core microservice me():', err);
       throw new RpcException(err?.message || 'Internal server error');
@@ -38,31 +38,25 @@ export class UsersController {
   @GrpcMethod('UsersService', 'FindOne')
   async findOne(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
-    const user = await this.usersService.findOne(data.id);
-    return { data: user };
+    return this.usersService.findOne(data.id);
   }
 
   @GrpcMethod('UsersService', 'UpdateUser')
-  async update(payload: { data?: UpdateUserDto }) {
-    const updateUserDto = payload?.data;
-    if (!updateUserDto?.id) throw new RpcException('Missing user ID');
-    const message = await this.usersService.update(
-      updateUserDto.id,
-      updateUserDto,
-    );
-    return { data: message };
+  async update(payload: { id?: string; user?: UpdateUserDto }) {
+    if (!payload?.id) throw new RpcException('Missing user ID');
+    const updateUserDto = payload.user ?? ({} as UpdateUserDto);
+    const message = await this.usersService.update(payload.id, updateUserDto);
+    return message;
   }
 
   @GrpcMethod('UsersService', 'RemoveUser')
   async remove(data: { id: string }) {
     if (!data?.id) throw new RpcException('Missing ID');
-    const message = await this.usersService.remove(data.id);
-    return { data: message };
+    return this.usersService.remove(data.id);
   }
 
   @GrpcMethod('UsersService', 'RemoveAllUsers')
   async removeAllUsers() {
-    const message = await this.usersService.removeAllUsers();
-    return { data: message };
+    return this.usersService.removeAllUsers();
   }
 }

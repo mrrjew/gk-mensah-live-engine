@@ -43,12 +43,75 @@ message ThirdPartyRequest {
   string phoneNumber = 3;
 }
 
-message StructPayload {
-  google.protobuf.Struct data = 1;
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  string firstName = 5;
+  string lastName = 6;
+  string password = 7;
+  string role = 8;
+  string createdAt = 9;
+  string updatedAt = 10;
+  string lastLogin = 11;
+  bool isActive = 12;
+  bool isEmailVerified = 13;
+  bool isTwoFactorEnabled = 14;
+  string twoFactorSecret = 15;
+  string resetToken = 16;
+  string profilePicture = 17;
+  string resetTokenExpiry = 18;
+  string lockExpiry = 19;
+  string createdBy = 20;
+  string updatedBy = 21;
+  string deletedAt = 22;
+  string deletedBy = 23;
+  google.protobuf.Struct metadata = 24;
+  string sessionId = 25;
+  google.protobuf.Struct deviceInfo = 26;
+  string ipAddress = 27;
+  string userAgent = 28;
+  repeated string twoFactorBackupCodes = 29;
+  string passwordResetRequestedAt = 30;
+  string emailVerificationToken = 31;
+  string emailVerificationTokenExpiry = 32;
+  string lastFailedLogin = 33;
+  int32 failedLoginAttempts = 34;
+  string lastPasswordReset = 35;
+  string passwordResetToken = 36;
+  string passwordResetTokenExpiry = 37;
+  string accountStatus = 38;
+  repeated google.protobuf.Struct securityQuestions = 39;
+  repeated google.protobuf.Struct securityAnswers = 40;
+  string lastSecurityQuestionChange = 41;
+  string lastSecurityAnswerChange = 42;
+  bool passwordChangeRequired = 43;
+  string passwordChangeDeadline = 44;
+  string accountRecoveryEmail = 45;
+  string accountRecoveryPhone = 46;
+  string accountRecoveryToken = 47;
+  string accountRecoveryTokenExpiry = 48;
+  string accountRecoveryRequestedAt = 49;
+  string accountRecoveryStatus = 50;
+  string accountRecoveryMethod = 51;
+  bool accountRecoveryVerified = 52;
+  string accountRecoveryVerificationToken = 53;
+  string accountRecoveryVerificationTokenExpiry = 54;
+  string accountRecoveryVerificationRequestedAt = 55;
 }
 
-message StructList {
-  repeated google.protobuf.Struct items = 1;
+message UsersList {
+  repeated User items = 1;
+}
+
+message MeRequest {
+  string userId = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  User user = 2;
 }
 
 message IdRequest {
@@ -140,16 +203,17 @@ service AuthenticationService {
   rpc CreateAdminUser(AuthRequest) returns (AuthResponse);
   rpc LoginUser(LoginRequest) returns (AuthResponse);
   rpc ValidateThirdParty(ThirdPartyRequest) returns (AuthResponse);
+  rpc Me(MeRequest) returns (User);
 }
 
 service UsersService {
   rpc PingMe(google.protobuf.Empty) returns (PingReply);
-  rpc Me(StructPayload) returns (StructPayload);
-  rpc FindAll(google.protobuf.Empty) returns (StructList);
-  rpc FindOne(IdRequest) returns (StructPayload);
-  rpc UpdateUser(StructPayload) returns (StructPayload);
-  rpc RemoveUser(IdRequest) returns (StructPayload);
-  rpc RemoveAllUsers(google.protobuf.Empty) returns (StructPayload);
+  rpc Me(MeRequest) returns (User);
+  rpc FindAll(google.protobuf.Empty) returns (UsersList);
+  rpc FindOne(IdRequest) returns (User);
+  rpc UpdateUser(UpdateUserRequest) returns (User);
+  rpc RemoveUser(IdRequest) returns (User);
+  rpc RemoveAllUsers(google.protobuf.Empty) returns (GenericResponse);
 }
 
 service MembershipsService {

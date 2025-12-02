@@ -20,7 +20,7 @@ import { ZoomModule } from './zoom/zoom.module';
       autoSchemaFile: true,
       driver: ApolloDriver,
       sortSchema: true,
-      context: ({ req }) => ({ headers: req.headers }),
+      context: ({ req, res }) => ({ req, res }),
       playground: true,
       path: 'api/v1/graphql',
       introspection: true,

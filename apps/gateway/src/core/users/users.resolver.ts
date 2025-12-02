@@ -7,15 +7,38 @@ import { Public } from '../../common/decorators/public.decorator';
 import { ResponseService } from '../../common/utils/response';
 import {
   Empty,
+  GenericResponse,
+  MeRequest,
   PingReply,
-  StructList,
-  StructPayload,
+  UpdateUserRequest,
+  User as GrpcUser,
   UsersGrpcService,
+  UsersList,
 } from '../../grpc/core-grpc.types';
 
 @Resolver(() => User)
 export class UsersResolver implements OnModuleInit {
   private usersService: UsersGrpcService;
+  private readonly dateFields: (keyof GrpcUser)[] = [
+    'createdAt',
+    'updatedAt',
+    'lastLogin',
+    'resetTokenExpiry',
+    'lockExpiry',
+    'deletedAt',
+    'passwordResetRequestedAt',
+    'emailVerificationTokenExpiry',
+    'lastFailedLogin',
+    'lastPasswordReset',
+    'passwordResetTokenExpiry',
+    'lastSecurityQuestionChange',
+    'lastSecurityAnswerChange',
+    'passwordChangeDeadline',
+    'accountRecoveryTokenExpiry',
+    'accountRecoveryRequestedAt',
+    'accountRecoveryVerificationTokenExpiry',
+    'accountRecoveryVerificationRequestedAt',
+  ];
 
   constructor(
     @Inject('CORE_SERVICE') private readonly coreService: ClientGrpc,
@@ -45,6 +68,8 @@ export class UsersResolver implements OnModuleInit {
   @Query(() => User, { name: 'me' })
   async me(@Context() context: any) {
     const req = context.req;
+    console.log('GraphQL context request object:', req.user);
+    console.log('GraphQL context object:', context.req.user);
 
     if (!req?.user) {
       throw new Error('Unauthorized: Missing user in context');
@@ -55,11 +80,11 @@ export class UsersResolver implements OnModuleInit {
       req.user,
     );
 
-    const response = await this.responseService.sendRequest<
-      StructPayload<User>
-    >(this.usersService.me({ data: { user: req.user } }));
+    const response = await this.responseService.sendRequest<GrpcUser>(
+      this.usersService.me({ userId: req.user.sub } as MeRequest),
+    );
 
-    return response.data as User;
+    return this.toGraphqlUser(response);
   }
 
   /**
@@ -67,10 +92,10 @@ export class UsersResolver implements OnModuleInit {
    */
   @Query(() => [User], { name: 'users' })
   async findAll() {
-    const response = await this.responseService.sendRequest<StructList<User>>(
+    const response = await this.responseService.sendRequest<UsersList>(
       this.usersService.findAll({} as Empty),
     );
-    return response.items ?? [];
+    return (response.items ?? []).map((user) => this.toGraphqlUser(user));
   }
 
   /**
@@ -78,10 +103,10 @@ export class UsersResolver implements OnModuleInit {
    */
   @Query(() => User, { name: 'user' })
   async findOne(@Args('id', { type: () => String }) id: string) {
-    const response = await this.responseService.sendRequest<
-      StructPayload<User>
-    >(this.usersService.findOne({ id }));
-    return response.data as User;
+    const response = await this.responseService.sendRequest<GrpcUser>(
+      this.usersService.findOne({ id }),
+    );
+    return this.toGraphqlUser(response);
   }
 
   /**
@@ -89,10 +114,14 @@ export class UsersResolver implements OnModuleInit {
    */
   @Mutation(() => User)
   async updateUser(@Args('input') input: UpdateUserInput) {
-    const response = await this.responseService.sendRequest<
-      StructPayload<User>
-    >(this.usersService.updateUser({ data: input }));
-    return response.data as User;
+    const { id, ...userData } = input;
+    const response = await this.responseService.sendRequest<GrpcUser>(
+      this.usersService.updateUser({
+        id,
+        user: userData,
+      } as UpdateUserRequest),
+    );
+    return this.toGraphqlUser(response);
   }
 
   /**
@@ -100,10 +129,10 @@ export class UsersResolver implements OnModuleInit {
    */
   @Mutation(() => User)
   async removeUser(@Args('id', { type: () => String }) id: string) {
-    const response = await this.responseService.sendRequest<
-      StructPayload<User>
-    >(this.usersService.removeUser({ id }));
-    return response.data as User;
+    const response = await this.responseService.sendRequest<GrpcUser>(
+      this.usersService.removeUser({ id }),
+    );
+    return this.toGraphqlUser(response);
   }
 
   /**
@@ -111,9 +140,26 @@ export class UsersResolver implements OnModuleInit {
    */
   @Mutation(() => StringResponse)
   async removeAllUsers() {
-    const response = await this.responseService.sendRequest<
-      StructPayload<StringResponse>
-    >(this.usersService.removeAllUsers({} as Empty));
-    return response.data ?? { message: 'All users removed successfully' };
+    const response = await this.responseService.sendRequest<GenericResponse>(
+      this.usersService.removeAllUsers({} as Empty),
+    );
+    return {
+      message: response?.message ?? 'All users removed successfully',
+    };
+  }
+
+  private toGraphqlUser(user?: GrpcUser | null): User {
+    if (!user) {
+      throw new Error('User payload missing');
+    }
+
+    const normalized: Record<string, any> = { ...user };
+    this.dateFields.forEach((field) => {
+      if (normalized[field as string]) {
+        normalized[field as string] = new Date(normalized[field as string]);
+      }
+    });
+
+    return normalized as User;
   }
 }

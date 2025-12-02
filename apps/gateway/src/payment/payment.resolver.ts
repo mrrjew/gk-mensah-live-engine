@@ -37,9 +37,13 @@ export class PaymentResolver implements OnModuleInit {
       userId: user.sub,
     };
 
-    return this.responseService.sendRequest<PaymentResponse>(
+    const response = await this.responseService.sendRequest<PaymentResponse>(
       this.paymentService.initializePayment(payload as PaymentInitRequest),
     );
+
+    console.log('initializePayment response:', response);
+
+    return response;
   }
 
   @Query(() => VerifyResponse)

@@ -1,11 +1,7 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Inject, OnModuleInit, UseGuards } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import {
-  Auth,
-  CreateUserInput,
-  CreateAdminUserInput,
-} from './dto/create-user.dto';
+import { Auth, CreateUserInput, CreateAdminUserInput } from './dto/create-user.dto';
 import { LoginInput } from './dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { ResponseService } from '../../common/utils/response';
