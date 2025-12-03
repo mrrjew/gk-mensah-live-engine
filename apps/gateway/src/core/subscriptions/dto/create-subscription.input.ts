@@ -4,6 +4,7 @@ import {
   Int,
   registerEnumType,
   ObjectType,
+  GraphQLISODateTime,
 } from '@nestjs/graphql';
 import {
   IsString,
@@ -64,10 +65,14 @@ export class Subscription {
   @IsEnum(SubscriptionFeature, { each: true })
   features: SubscriptionFeature[];
 
-  @Field({ nullable: true, defaultValue: false })
-  @IsBoolean()
-  @IsOptional()
+  @Field({ defaultValue: false })
   mostPopular?: boolean = false;
+
+  @Field(() => Boolean)
+  isArchived: boolean;
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  archivedAt?: Date | null;
 }
 @InputType()
 export class CreateSubscriptionInput {
@@ -102,5 +107,5 @@ export class CreateSubscriptionInput {
   @Field({ nullable: true, defaultValue: false })
   @IsBoolean()
   @IsOptional()
-  mostPopular?: boolean = false;
+  isArchived?: boolean = false;
 }

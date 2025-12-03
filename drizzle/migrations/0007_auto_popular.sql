@@ -1,0 +1,1 @@
+ALTER TABLE "subscriptions" RENAME COLUMN "is_popular" TO "most_popular";

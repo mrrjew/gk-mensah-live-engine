@@ -105,12 +105,24 @@ export class MembershipsService {
   }
 
   async remove(id: string) {
-    const deleted = await this.drizzleService.db
-      .delete(Memberships)
-      .where(eq(Memberships.id, id))
-      .returning();
-    if (!deleted.length) throw new NotFoundException('Membership not found');
-    return { success: true, message: 'Membership deleted successfully' };
+    const [membership] = await this.drizzleService.db
+      .select()
+      .from(Memberships)
+      .where(eq(Memberships.id, id));
+
+    if (!membership) {
+      throw new NotFoundException('Membership not found');
+    }
+
+    await this.drizzleService.db
+      .update(Memberships)
+      .set({
+        isActive: false,
+        endDate: new Date(),
+      })
+      .where(eq(Memberships.id, id));
+
+    return { success: true, message: 'Membership cancelled successfully' };
   }
 
   @Cron(CronExpression.EVERY_MINUTE)

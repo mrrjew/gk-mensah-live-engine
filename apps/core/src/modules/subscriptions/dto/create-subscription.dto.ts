@@ -43,5 +43,5 @@ export class CreateSubscriptionDto {
 
   @IsBoolean()
   @IsOptional()
-  mostPopular?: boolean = false;
+  isArchived?: boolean = false;
 }

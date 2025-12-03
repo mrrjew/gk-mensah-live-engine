@@ -96,6 +96,7 @@ export interface User {
   accountRecoveryVerificationToken?: string;
   accountRecoveryVerificationTokenExpiry?: string;
   accountRecoveryVerificationRequestedAt?: string;
+  apiKey?: string;
 }
 
 export interface UsersList {
@@ -162,6 +163,8 @@ export interface SubscriptionDto {
   durationDays?: number;
   features?: string[];
   mostPopular?: boolean;
+  isArchived?: boolean;
+  archivedAt?: string | null;
 }
 
 export interface SubscriptionList {
@@ -176,10 +179,13 @@ export interface SubscriptionCreateRequest extends Omit<SubscriptionDto, 'id'> {
   durationDays: number;
   features: string[];
   mostPopular?: boolean;
+  isArchived?: boolean;
+  archivedAt?: string | null;
 }
 
 export interface SubscriptionUpdateRequest extends SubscriptionCreateRequest {
   id: string;
+  archivedAt?: string | null;
 }
 
 export interface AuthenticationGrpcService {

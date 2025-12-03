@@ -99,6 +99,7 @@ message User {
   string accountRecoveryVerificationToken = 53;
   string accountRecoveryVerificationTokenExpiry = 54;
   string accountRecoveryVerificationRequestedAt = 55;
+  string apiKey = 56;
 }
 
 message UsersList {
@@ -169,6 +170,8 @@ message Subscription {
   int32 durationDays = 6;
   repeated string features = 7;
   bool mostPopular = 8;
+  bool isArchived = 9;
+  string archivedAt = 10;
 }
 
 message SubscriptionList {
@@ -183,6 +186,8 @@ message SubscriptionCreateRequest {
   int32 durationDays = 5;
   repeated string features = 6;
   bool mostPopular = 7;
+  bool isArchived = 8;
+  string archivedAt = 9;
 }
 
 message SubscriptionUpdateRequest {
@@ -194,6 +199,8 @@ message SubscriptionUpdateRequest {
   int32 durationDays = 6;
   repeated string features = 7;
   bool mostPopular = 8;
+  bool isArchived = 9;
+  string archivedAt = 10;
 }
 
 service AuthenticationService {

@@ -43,6 +43,27 @@
       "when": 1764201761945,
       "tag": "0005_sturdy_kate_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1764770879360,
+      "tag": "0006_sleepy_shatterstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1764777458280,
+      "tag": "0007_breezy_chamber",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1764780000000,
+      "tag": "0008_add_user_api_key",
+      "breakpoints": true
     }
   ]
 }

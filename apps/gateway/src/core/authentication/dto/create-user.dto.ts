@@ -24,8 +24,8 @@ export class User {
   @Field()
   password: string;
 
-  @Field()
-  role: string;
+  @Field({ nullable: true })
+  role?: string;
 
   @Field()
   createdAt: Date;
@@ -53,6 +53,9 @@ export class User {
 
   @Field({ nullable: true })
   profilePicture?: string;
+
+  @Field({ nullable: true })
+  adminKey?: string;
 
   @Field()
   resetTokenExpiry: Date;
