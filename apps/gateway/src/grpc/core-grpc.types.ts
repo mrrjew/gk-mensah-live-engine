@@ -24,7 +24,14 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   accessToken: string;
-  user: Record<string, any>;
+  user: PublicUser;
+}
+
+export interface PublicUser {
+  id: string;
+  email: string;
+  username: string;
+  role: string;
 }
 
 export interface ThirdPartyRequest {
@@ -33,12 +40,76 @@ export interface ThirdPartyRequest {
   phoneNumber?: string;
 }
 
-export interface StructPayload<T = Record<string, any>> {
-  data?: T;
+export interface User {
+  id?: string;
+  username?: string;
+  email?: string;
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+  role?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  lastLogin?: string;
+  isActive?: boolean;
+  isEmailVerified?: boolean;
+  isTwoFactorEnabled?: boolean;
+  twoFactorSecret?: string;
+  resetToken?: string;
+  profilePicture?: string;
+  resetTokenExpiry?: string;
+  lockExpiry?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  deletedAt?: string;
+  deletedBy?: string;
+  metadata?: Record<string, any>;
+  sessionId?: string;
+  deviceInfo?: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+  twoFactorBackupCodes?: string[];
+  passwordResetRequestedAt?: string;
+  emailVerificationToken?: string;
+  emailVerificationTokenExpiry?: string;
+  lastFailedLogin?: string;
+  failedLoginAttempts?: number;
+  lastPasswordReset?: string;
+  passwordResetToken?: string;
+  passwordResetTokenExpiry?: string;
+  accountStatus?: string;
+  securityQuestions?: Record<string, any>[];
+  securityAnswers?: Record<string, any>[];
+  lastSecurityQuestionChange?: string;
+  lastSecurityAnswerChange?: string;
+  passwordChangeRequired?: boolean;
+  passwordChangeDeadline?: string;
+  accountRecoveryEmail?: string;
+  accountRecoveryPhone?: string;
+  accountRecoveryToken?: string;
+  accountRecoveryTokenExpiry?: string;
+  accountRecoveryRequestedAt?: string;
+  accountRecoveryStatus?: string;
+  accountRecoveryMethod?: string;
+  accountRecoveryVerified?: boolean;
+  accountRecoveryVerificationToken?: string;
+  accountRecoveryVerificationTokenExpiry?: string;
+  accountRecoveryVerificationRequestedAt?: string;
+  apiKey?: string;
 }
 
-export interface StructList<T = Record<string, any>> {
-  items: T[];
+export interface UsersList {
+  items: User[];
+}
+
+export interface MeRequest {
+  userId: string;
+}
+
+export interface UpdateUserRequest {
+  id: string;
+  user?: User;
 }
 
 export interface IdRequest {
@@ -92,6 +163,8 @@ export interface SubscriptionDto {
   durationDays?: number;
   features?: string[];
   mostPopular?: boolean;
+  isArchived?: boolean;
+  archivedAt?: string | null;
 }
 
 export interface SubscriptionList {
@@ -106,10 +179,13 @@ export interface SubscriptionCreateRequest extends Omit<SubscriptionDto, 'id'> {
   durationDays: number;
   features: string[];
   mostPopular?: boolean;
+  isArchived?: boolean;
+  archivedAt?: string | null;
 }
 
 export interface SubscriptionUpdateRequest extends SubscriptionCreateRequest {
   id: string;
+  archivedAt?: string | null;
 }
 
 export interface AuthenticationGrpcService {
@@ -119,16 +195,17 @@ export interface AuthenticationGrpcService {
   createAdminUser(request: AuthRequest): Observable<AuthResponse>;
   loginUser(request: LoginRequest): Observable<AuthResponse>;
   validateThirdParty(request: ThirdPartyRequest): Observable<AuthResponse>;
+  me(request: MeRequest): Observable<User>;
 }
 
 export interface UsersGrpcService {
   pingMe(request: Empty): Observable<PingReply>;
-  me(request: StructPayload): Observable<StructPayload>;
-  findAll(request: Empty): Observable<StructList>;
-  findOne(request: IdRequest): Observable<StructPayload>;
-  updateUser(request: StructPayload): Observable<StructPayload>;
-  removeUser(request: IdRequest): Observable<StructPayload>;
-  removeAllUsers(request: Empty): Observable<StructPayload>;
+  me(request: MeRequest): Observable<User>;
+  findAll(request: Empty): Observable<UsersList>;
+  findOne(request: IdRequest): Observable<User>;
+  updateUser(request: UpdateUserRequest): Observable<User>;
+  removeUser(request: IdRequest): Observable<User>;
+  removeAllUsers(request: Empty): Observable<GenericResponse>;
 }
 
 export interface MembershipsGrpcService {

@@ -16,6 +16,16 @@ import {
   SubscriptionsGrpcService,
 } from '../../grpc/core-grpc.types';
 
+const normalizeSubscription = (dto: SubscriptionDto): Subscription => {
+  const archivedAtValue = dto?.archivedAt
+    ? new Date(dto.archivedAt as string)
+    : null;
+  return {
+    ...(dto as Subscription),
+    archivedAt: archivedAtValue,
+  };
+};
+
 @Resolver(() => Subscription)
 export class SubscriptionsResolver {
   private subscriptionsService?: SubscriptionsGrpcService;
@@ -27,33 +37,45 @@ export class SubscriptionsResolver {
 
   private get service(): SubscriptionsGrpcService {
     if (!this.subscriptionsService) {
-      this.subscriptionsService = this.coreClient.getService<SubscriptionsGrpcService>(
-        'SubscriptionsService',
-      );
+      this.subscriptionsService =
+        this.coreClient.getService<SubscriptionsGrpcService>(
+          'SubscriptionsService',
+        );
     }
     return this.subscriptionsService;
   }
 
   @Query(() => [Subscription])
-  async subscriptions() {
+  async subscriptions(
+    @Args('includeArchived', { type: () => Boolean, nullable: true })
+    includeArchived?: boolean,
+  ) {
     const response = await this.responseService.sendRequest<SubscriptionList>(
       this.service.findAll({} as Empty),
     );
-    return (response.items ?? []) as Subscription[];
+    const items = (response.items ?? []).map((item) =>
+      normalizeSubscription(item),
+    );
+    if (includeArchived) {
+      return items;
+    }
+    return items.filter((item) => !item.isArchived);
   }
 
   @Query(() => Subscription)
   async subscription(@Args('id', { type: () => String }) id: string) {
-    return this.responseService.sendRequest<SubscriptionDto>(
+    const dto = await this.responseService.sendRequest<SubscriptionDto>(
       this.service.findOne({ id }),
     );
+    return normalizeSubscription(dto);
   }
 
   @Mutation(() => Subscription)
   async createSubscription(@Args('input') input: CreateSubscriptionInput) {
-    return this.responseService.sendRequest<SubscriptionDto>(
+    const dto = await this.responseService.sendRequest<SubscriptionDto>(
       this.service.create(input),
     );
+    return normalizeSubscription(dto);
   }
 
   @Mutation(() => StringResponse)

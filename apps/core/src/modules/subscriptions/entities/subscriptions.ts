@@ -35,7 +35,9 @@ export const Subscriptions = pgTable('subscriptions', {
   currency: varchar('currency', { length: 10 }).notNull().default('GHS'),
   durationDays: integer('duration_days').notNull(),
   features: subscriptionFeatureEnum('features').array().notNull(),
-  isPopular: boolean('is_popular').default(false),
+  mostPopular: boolean('most_popular').default(false),
+  isArchived: boolean('is_archived').default(false).notNull(),
+  archivedAt: timestamp('archived_at'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

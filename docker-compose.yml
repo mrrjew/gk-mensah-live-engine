@@ -1,0 +1,83 @@
+version: '3.9'
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 4001
+      GATEWAY_PORT: 3001
+      CORE_HOST: core
+      CORE_PORT: 3003
+      PAYMENT_HOST: payment
+      PAYMENT_PORT: 3002
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - '4001:4001'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:4001/ || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - core
+      - payment
+    volumes:
+      - ./proto:/app/proto:ro
+    networks:
+      - app-network
+
+  core:
+    build:
+      context: .
+      dockerfile: apps/core/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 4003
+      CORE_PORT: 3003
+      CORE_HOST: 0.0.0.0
+      PAYMENT_HOST: payment
+      PAYMENT_PORT: 3002
+    ports:
+      - '4003:4003'
+      - '3003:3003'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:4003/ || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - ./proto:/app/proto:ro
+    networks:
+      - app-network
+
+  payment:
+    build:
+      context: .
+      dockerfile: apps/payment/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 4002
+      PAYMENT_PORT: 3002
+      PAYMENT_HOST: 0.0.0.0
+    ports:
+      - '4002:4002'
+      - '3002:3002'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:4002/ || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - ./proto:/app/proto:ro
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

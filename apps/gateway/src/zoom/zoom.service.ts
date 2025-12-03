@@ -117,7 +117,8 @@ export class ZoomService {
       this.logger.error('Failed to persist meeting to DB', err?.message);
     }
 
-    return meeting;
+    const mapped = this.mapMeetingResponse(meeting);
+    return mapped;
   }
 
   async getActiveMeeting() {
@@ -129,21 +130,13 @@ export class ZoomService {
         .orderBy(desc(zoomMeetings.createdAt))
         .limit(1);
 
-      console.log('Active meeting fetch result:', result);
-
       if (result.length === 0) {
         return null;
       }
 
       const meeting = result[0];
-      return {
-        id: meeting.zoomId,
-        topic: meeting.topic,
-        join_url: meeting.joinUrl,
-        start_url: meeting.startUrl,
-        password: meeting.password,
-        start_time: meeting.startTime,
-      };
+      const mapped = this.mapMeetingResponse(meeting);
+      return mapped;
     } catch (err: any) {
       this.logger.error('Failed to fetch active meeting from DB', err?.message);
       return null;
@@ -158,19 +151,45 @@ export class ZoomService {
         .where(eq(zoomMeetings.zoomId, zoomId))
         .limit(1);
 
-      if (!result || result.length === 0) return null;
+      if (!result || result.length === 0) {
+        return null;
+      }
       const meeting = result[0];
-      return {
-        id: meeting.zoomId,
-        topic: meeting.topic,
-        join_url: meeting.joinUrl,
-        start_url: meeting.startUrl,
-        password: meeting.password,
-        start_time: meeting.startTime,
-      };
+      const mapped = this.mapMeetingResponse(meeting);
+      return mapped;
     } catch (err: any) {
       this.logger.error('Failed to fetch meeting by zoomId', err?.message);
       return null;
     }
+  }
+
+  private mapMeetingResponse(raw: any) {
+    if (!raw) {
+      return null;
+    }
+
+    const idValue = raw.zoomId ?? raw.id ?? raw.uuid;
+    if (!idValue) {
+      this.logger.warn('Zoom meeting payload missing id field');
+      return null;
+    }
+
+    const startTime = raw.start_time ?? raw.startTime ?? null;
+    const joinUrl = raw.join_url ?? raw.joinUrl ?? null;
+    const startUrl = raw.start_url ?? raw.startUrl ?? null;
+
+    return {
+      id: String(idValue),
+      topic: raw.topic ?? null,
+      join_url: joinUrl ?? null,
+      start_url: startUrl ?? null,
+      password: raw.password ?? null,
+      start_time:
+        typeof startTime === 'string'
+          ? startTime
+          : startTime instanceof Date
+            ? startTime.toISOString()
+            : null,
+    };
   }
 }

@@ -14,6 +14,9 @@ const CLIENTS: ClientsModuleAsyncOptions = [
         package: 'core',
         protoPath: [join(protoDir, 'core.proto')],
         url: `${configService.get('CORE_HOST') || 'localhost'}:${configService.get('CORE_PORT') || 3003}`,
+        loader: {
+          keepCase: true,
+        },
       },
     }),
     inject: [ConfigService],
@@ -27,6 +30,9 @@ const CLIENTS: ClientsModuleAsyncOptions = [
         package: 'payment',
         protoPath: [join(protoDir, 'payment.proto')],
         url: `${configService.get('PAYMENT_HOST') || 'localhost'}:${configService.get('PAYMENT_PORT') || 3002}`,
+        loader: {
+          keepCase: true,
+        },
       },
     }),
     inject: [ConfigService],

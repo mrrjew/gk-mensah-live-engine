@@ -37,9 +37,13 @@ export class PaymentResolver implements OnModuleInit {
       userId: user.sub,
     };
 
-    return this.responseService.sendRequest<PaymentResponse>(
+    const response = await this.responseService.sendRequest<PaymentResponse>(
       this.paymentService.initializePayment(payload as PaymentInitRequest),
     );
+
+    console.log('initializePayment response:', response);
+
+    return response;
   }
 
   @Query(() => VerifyResponse)
@@ -53,9 +57,10 @@ export class PaymentResolver implements OnModuleInit {
 
   @Query(() => Payment)
   async payment(@Args('paymentId', { type: () => String }) paymentId: string) {
-    return this.responseService.sendRequest<Payment>(
+    const response = await this.responseService.sendRequest<Payment>(
       this.paymentService.getPayment({ paymentId }),
     );
+    return this.toGraphqlPayment(response);
   }
 
   @Query(() => [Payment])
@@ -63,7 +68,9 @@ export class PaymentResolver implements OnModuleInit {
     const response = await this.responseService.sendRequest<PaymentsList>(
       this.paymentService.getPayments({} as Empty),
     );
-    return response.items ?? [];
+    return (response.items ?? []).map((payment) =>
+      this.toGraphqlPayment(payment as unknown as Payment),
+    );
   }
 
   @Query(() => [Payment])
@@ -71,7 +78,9 @@ export class PaymentResolver implements OnModuleInit {
     const response = await this.responseService.sendRequest<PaymentsList>(
       this.paymentService.getPaymentsByUser({ userId }),
     );
-    return response.items ?? [];
+    return (response.items ?? []).map((payment) =>
+      this.toGraphqlPayment(payment as unknown as Payment),
+    );
   }
 
   @Query(() => String)
@@ -80,5 +89,18 @@ export class PaymentResolver implements OnModuleInit {
       message?: string;
     }>(this.paymentService.ping({} as Empty));
     return response.message;
+  }
+
+  private toGraphqlPayment(payment?: Partial<Payment> | null): Payment {
+    if (!payment) {
+      throw new Error('Payment payload missing');
+    }
+
+    const normalized: Record<string, any> = { ...payment };
+    if (normalized.paymentDate) {
+      normalized.paymentDate = new Date(normalized.paymentDate);
+    }
+
+    return normalized as Payment;
   }
 }

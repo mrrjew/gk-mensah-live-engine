@@ -9,19 +9,18 @@ import { RpcException } from '@nestjs/microservices';
 export class UsersService {
   constructor(private readonly drizzleService: DrizzleService) {}
 
-  async me(payload: { user?: { sub?: string } }) {
+  async me(userId?: string) {
     try {
-      console.log('From DB payload:', payload);
+      console.log('From DB userId:', userId);
 
-      // Validate that the user info was actually passed
-      if (!payload?.user?.sub) {
+      if (!userId) {
         throw new RpcException('User ID not provided in request payload');
       }
 
       const [user] = await this.drizzleService.db
         .select()
         .from(Users)
-        .where(eq(Users.id, payload.user.sub));
+        .where(eq(Users.id, userId));
 
       if (!user) throw new RpcException('User not found');
 
@@ -92,7 +91,7 @@ export class UsersService {
   async removeAllUsers() {
     try {
       await this.drizzleService.db.delete(Users);
-      return { message: `All Users removed successfully` };
+      return { success: true, message: 'All Users removed successfully' };
     } catch (error) {
       throw new RpcException('Failed to remove user');
     }

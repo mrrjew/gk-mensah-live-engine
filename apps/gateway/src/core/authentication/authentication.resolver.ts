@@ -1,11 +1,7 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Inject, OnModuleInit, UseGuards } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import {
-  Auth,
-  CreateUserInput,
-  CreateAdminUserInput,
-} from './dto/create-user.dto';
+import { Auth, CreateUserInput, CreateAdminUserInput } from './dto/create-user.dto';
 import { LoginInput } from './dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { ResponseService } from '../../common/utils/response';
@@ -60,6 +56,12 @@ export class AuthenticationResolver implements OnModuleInit {
 
   @Mutation(() => Auth, { name: 'loginUser' })
   @Public()
+  /**
+   * Logs in a user with the provided credentials.
+   * The responseService takes in a pattern or an observable to send the request to the microservice.
+   * @param input - The login input containing user credentials.
+   * @returns The authentication response containing tokens and user info.
+   */
   async loginUser(@Args('input') input: LoginInput) {
     const res = await this.responseService.sendRequest<Auth>(
       this.authenticationService.loginUser(input),

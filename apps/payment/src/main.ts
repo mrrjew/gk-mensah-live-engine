@@ -21,10 +21,15 @@ async function bootstrap() {
       package: 'payment',
       protoPath: [join(process.cwd(), 'proto/payment.proto')],
       url: `${grpcHost}:${grpcPort}`,
+      loader: {
+        keepCase: true,
+      },
     },
   };
 
-  app.connectMicroservice<MicroserviceOptions>(grpcOptions);
+  app.connectMicroservice<MicroserviceOptions>(grpcOptions, {
+    inheritAppConfig: true,
+  });
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
