@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   gateway:
-    image: registry.digitalocean.com/gklive/live-engine:gateway
+    image: registry.digitalocean.com/gklive/gateway:gateway
     build:
       context: .
       dockerfile: apps/gateway/Dockerfile
@@ -32,7 +32,7 @@ services:
       - app-network
 
   core:
-    image: registry.digitalocean.com/gklive/live-engine:core
+    image: registry.digitalocean.com/gklive/gateway:core
     build:
       context: .
       dockerfile: apps/core/Dockerfile
@@ -58,7 +58,7 @@ services:
       - app-network
 
   payment:
-    image: registry.digitalocean.com/gklive/live-engine:payment
+    image: registry.digitalocean.com/gklive/gateway:payment
     build:
       context: .
       dockerfile: apps/payment/Dockerfile
