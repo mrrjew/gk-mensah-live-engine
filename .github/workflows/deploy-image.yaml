@@ -34,9 +34,7 @@ jobs:
       # 5. Build all NestJS apps
       - name: Build all NestJS apps
         run: |
-          pnpm run build:gateway
-          pnpm run build:core
-          pnpm run build:payment
+          pnpm run build
 
       # 6. Log in to DigitalOcean Container Registry
       - name: Log in to DigitalOcean Container Registry
