@@ -1,10 +1,18 @@
 name: Deploy Container Images
 
+
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      registry_name:
+        description: "DigitalOcean registry name (overrides repo variable)"
+        required: false
+
+env:
+  DO_REGISTRY_NAME: ${{ github.event.inputs.registry_name || vars.DIGITALOCEAN_REGISTRY || secrets.DIGITALOCEAN_REGISTRY }}
 
 env:
   REGISTRY: registry.digitalocean.com/${{ vars.DIGITALOCEAN_REGISTRY }}
@@ -18,6 +26,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Ensure registry name is set
+        run: |
+          if [ -z "$DO_REGISTRY_NAME" ]; then
+            echo "Set a repo variable/secret DIGITALOCEAN_REGISTRY or pass workflow input registry_name." >&2
+            exit 1
+          fi
+        env:
+          DO_REGISTRY_NAME: ${{ env.DO_REGISTRY_NAME }}
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -35,6 +52,6 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ env.REGISTRY }}/${{ matrix.service }}:latest
-            ${{ env.REGISTRY }}/${{ matrix.service }}:${{ github.sha }}
+            registry.digitalocean.com/${{ env.DO_REGISTRY_NAME }}/${{ matrix.service }}:latest
+            registry.digitalocean.com/${{ env.DO_REGISTRY_NAME }}/${{ matrix.service }}:${{ github.sha }}
 
