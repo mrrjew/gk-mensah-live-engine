@@ -52,7 +52,7 @@ async function bootstrap() {
 
   // Start both HTTP and microservice
   await app.startAllMicroservices();
-  await app.listen(httpPort);
+  await app.listen(httpPort,'0.0.0.0');
   console.log(
     `Gateway microservice is running on HTTP port ${httpPort} and TCP port ${tcpPort}`,
   );

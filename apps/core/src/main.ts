@@ -39,7 +39,7 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  await app.listen(httpPort);
+  await app.listen(httpPort,'0.0.0.0');
   console.log(
     `Core microservice is running on HTTP port ${httpPort} with gRPC endpoint ${grpcHost}:${grpcPort}`,
   );
