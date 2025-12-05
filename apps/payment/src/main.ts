@@ -34,7 +34,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.startAllMicroservices();
-  await app.listen(httpPort);
+  await app.listen(httpPort,'0.0.0.0');
   console.log(
     `Payment microservice is running on HTTP port ${httpPort} with gRPC endpoint ${grpcHost}:${grpcPort}`,
   );
