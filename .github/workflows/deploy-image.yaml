@@ -47,15 +47,15 @@ jobs:
       # 7. Build and push Docker images for all services
       - name: Build and push gateway image
         run: |
-          docker build -t registry.digitalocean.com/gklive/gateway:latest -f ./apps/gateway/Dockerfile ./apps/gateway
+          docker build -t registry.digitalocean.com/gklive/gateway:latest -f apps/gateway/Dockerfile .
           docker push registry.digitalocean.com/gklive/gateway:latest
 
       - name: Build and push core image
         run: |
-          docker build -t registry.digitalocean.com/gklive/core:latest -f ./apps/core/Dockerfile ./apps/core
+          docker build -t registry.digitalocean.com/gklive/core:latest -f apps/core/Dockerfile .
           docker push registry.digitalocean.com/gklive/core:latest
 
       - name: Build and push payment image
         run: |
-          docker build -t registry.digitalocean.com/gklive/payment:latest -f ./apps/payment/Dockerfile ./apps/payment
+          docker build -t registry.digitalocean.com/gklive/payment:latest -f apps/payment/Dockerfile .
           docker push registry.digitalocean.com/gklive/payment:latest
