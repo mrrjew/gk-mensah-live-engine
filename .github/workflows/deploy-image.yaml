@@ -12,7 +12,6 @@ jobs:
 build-push:
 runs-on: ubuntu-latest
 
-```
 steps:
   # 1. Checkout code
   - name: Checkout repository
@@ -62,4 +61,3 @@ steps:
     run: |
       docker build -t registry.digitalocean.com/gklive/payment:latest -f ./apps/payment/Dockerfile ./apps/payment
       docker push registry.digitalocean.com/gklive/payment:latest
-```
