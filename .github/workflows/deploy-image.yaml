@@ -1,61 +1,65 @@
-# .github/workflows/deploy-nest-docr.yml
 name: Build and Push NestJS Docker Images to DigitalOcean
 
 on:
-  push:
-    branches: [ main ]  # Trigger on push to main branch
+push:
+branches: [ main ]  # Trigger on push to main branch
 
 permissions:
-  contents: read
-  packages: write
+contents: read
+packages: write
 
 jobs:
-  build-push:
-    runs-on: ubuntu-latest
+build-push:
+runs-on: ubuntu-latest
 
-    steps:
-      # 1. Checkout code
-      - name: Checkout repository
-        uses: actions/checkout@v4
+```
+steps:
+  # 1. Checkout code
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-      # 2. Set up Node.js (needed to build NestJS apps)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
+  # 2. Set up Node.js
+  - name: Set up Node.js
+    uses: actions/setup-node@v3
+    with:
+      node-version: 20
 
-      # 3. Install dependencies and build all services
-      - name: Install dependencies
-        run: npm install
+  # 3. Install pnpm globally
+  - name: Install pnpm
+    run: npm install -g pnpm
 
-      - name: Build all NestJS apps
-        run: |
-          npm run build:gateway
-          npm run build:core
-          npm run build:payment
+  # 4. Install dependencies using pnpm (deterministic)
+  - name: Install dependencies
+    run: pnpm install --frozen-lockfile
 
-      # 4. Log in to DigitalOcean Container Registry
-      - name: Log in to DigitalOcean Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: registry.digitalocean.com
-          username: doctl
-          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+  # 5. Build all NestJS apps
+  - name: Build all NestJS apps
+    run: |
+      pnpm run build:gateway
+      pnpm run build:core
+      pnpm run build:payment
 
-      # 5. Build and push gateway image
-      - name: Build and push gateway image
-        run: |
-          docker build -t registry.digitalocean.com/gklive/gateway:latest -f ./apps/gateway/Dockerfile ./apps/gateway
-          docker push registry.digitalocean.com/gklive/gateway:latest
+  # 6. Log in to DigitalOcean Container Registry
+  - name: Log in to DigitalOcean Container Registry
+    uses: docker/login-action@v2
+    with:
+      registry: registry.digitalocean.com
+      username: doctl
+      password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      # 6. Build and push core image
-      - name: Build and push core image
-        run: |
-          docker build -t registry.digitalocean.com/gklive/core:latest -f ./apps/core/Dockerfile ./apps/core
-          docker push registry.digitalocean.com/gklive/core:latest
+  # 7. Build and push Docker images for all services
+  - name: Build and push gateway image
+    run: |
+      docker build -t registry.digitalocean.com/gklive/gateway:latest -f ./apps/gateway/Dockerfile ./apps/gateway
+      docker push registry.digitalocean.com/gklive/gateway:latest
 
-      # 7. Build and push payment image
-      - name: Build and push payment image
-        run: |
-          docker build -t registry.digitalocean.com/gklive/payment:latest -f ./apps/payment/Dockerfile ./apps/payment
-          docker push registry.digitalocean.com/gklive/payment:latest
+  - name: Build and push core image
+    run: |
+      docker build -t registry.digitalocean.com/gklive/core:latest -f ./apps/core/Dockerfile ./apps/core
+      docker push registry.digitalocean.com/gklive/core:latest
+
+  - name: Build and push payment image
+    run: |
+      docker build -t registry.digitalocean.com/gklive/payment:latest -f ./apps/payment/Dockerfile ./apps/payment
+      docker push registry.digitalocean.com/gklive/payment:latest
+```
